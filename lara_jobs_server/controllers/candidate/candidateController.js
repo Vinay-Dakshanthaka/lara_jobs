@@ -1,4 +1,4 @@
-const { EMAIL_ALREADY_EXISTS, INTERNAL_SERVER_ERROR } = require('../../errors/errorCodes');
+const handleError = require('../../errors/errorHandler');
 const candidateService = require('../../services/candidate/candidateService');
 
 // Create a new candidate
@@ -6,9 +6,9 @@ const candidateService = require('../../services/candidate/candidateService');
 //     try {
 //         const candidateData = req.body;
 //         const newCandidate = await candidateService.createCandidate(candidateData);
-//         res.status(201).json(newCandidate);
+//        return res.status(201).json(newCandidate);
 //     } catch (error) {
-//         res.status(500).json({ message: error.message });
+//        return res.status(500).json({ message: error.message });
 //     }
 // };
 
@@ -16,49 +16,59 @@ const createCandidate = async (req, res) => {
     try {
         const { email } = req.body;
 
-        // Call the service method to create the candidate
         const newCandidate = await candidateService.createCandidate(email);
 
-        // If everything is successful, send a success response
-        res.status(201).json({
+        return res.status(201).json({
             message: 'Candidate created successfully and OTP sent to email.',
             candidate: newCandidate,
         });
     } catch (error) {
         console.log("Error while saving candidate email:", error);
-
-        // Handle specific error types (custom error codes)
-        if (error.code === 'EMAIL_ALREADY_EXISTS') {
-            res.status(409).json({
-                message: error.message,
-                code: error.code,
-            });
-        } else if (error.code === 'EMAIL_SENDING_FAILED') {
-            res.status(500).json({
-                message: 'There was an issue sending the OTP. Please try again later.',
-                code: error.code,
-            });
-        } else {
-            // For other internal server errors
-            res.status(500).json({
-                message: 'Internal server error. Please try again later.',
-                code: 'INTERNAL_SERVER_ERROR',
-            });
-        }
+        handleError(res, error)
     }
 };
 
+const resendOtpHandler = async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      const result = await resendOtp(email);
+      return res.status(200).json(result); 
+    } catch (error) {
+      console.log("Error while resending OTP:", error);
+      return handleError(res, error); 
+    }
+  };
 
 const updatePhoneNumber = async (req, res) => {
     try {
-        const { candidateId, phoneNumber } = req.body;
-        const updatedCandidate = await candidateService.updatePhoneNumber(candidateId, phoneNumber);
-        res.status(200).json({
+        const { email, phoneNumber } = req.body;
+        console.log("email : " , email)
+        console.log("email : " , phoneNumber)
+        const updatedCandidate = await candidateService.updatePhoneNumber(email, phoneNumber);
+        return res.status(200).json({
             message: 'Phone number updated and OTP sent to phone',
             candidate: updatedCandidate,
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.log("Error while updating the phone number : ", error)
+        handleError(res, error)
+    }
+};
+
+const updatePassword = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        // console.log("email : " , email)
+        // console.log("email : " , password)
+        await candidateService.updatePassword(email, password);
+        return res.status(200).json({
+            message: 'Password updated',
+            success : true,
+        });
+    } catch (error) {
+        console.log("Error while updating the password : ", error)
+        handleError(res, error)
     }
 };
 
@@ -68,9 +78,9 @@ const storePinCode = async (req, res) => {
     try {
         const { candidateId, pinCode } = req.body;
         await candidateService.storePinCode(candidateId, pinCode);
-        res.status(200).json({ message: 'Pin code stored successfully' });
+        return res.status(200).json({ message: 'Pin code stored successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        handleError(res, error)
     }
 };
 
@@ -80,9 +90,9 @@ const getCandidateByIdController = async (req, res) => {
     try {
         const { id } = req.params;
         const candidate = await candidateService.getCandidateById(id);
-        res.status(200).json(candidate);
+        return res.status(200).json(candidate);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        handleError(res, error)
     }
 };
 
@@ -94,7 +104,7 @@ const getAllCandidatesController = async (req, res) => {
 
         const { total, candidates } = await candidateService.getAllCandidates(page, pageSize);
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             data: candidates,
             total,  // Total record count for pagination
@@ -102,48 +112,44 @@ const getAllCandidatesController = async (req, res) => {
             pageSize,
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error fetching candidates: ' + error.message,
-        });
+        handleError(res, error)
     }
 };
 
 
 const searchCandidatesController = async (req, res) => {
     try {
-      const { name, email, phone_number } = req.body; // search parameters 
-      const { page = 1, pageSize = 10 } = req.query; // Get pagination params from query string (default to page 1 and 10 results per page)
-  
-      // Construct the search query object
-      const searchQuery = { name, email, phone_number };
-  
-      // Call the service to search for candidates
-      const candidates = await searchCandidates(searchQuery, page, pageSize);
-  
-      // Send back the response with search results
-      res.status(200).json({
-        page,
-        pageSize,
-        results: candidates,
-        total: candidates.length, // to get how many matching results are found
-      });
+        const { name, email, phone_number } = req.body; // search parameters 
+        const { page = 1, pageSize = 10 } = req.query; // Get pagination params from query string (default to page 1 and 10 results per page)
+
+        // Construct the search query object
+        const searchQuery = { name, email, phone_number };
+
+        // Call the service to search for candidates
+        const candidates = await searchCandidates(searchQuery, page, pageSize);
+
+        // Send back the response with search results
+        return res.status(200).json({
+            page,
+            pageSize,
+            results: candidates,
+            total: candidates.length, // to get how many matching results are found
+        });
     } catch (error) {
-      res.status(500).json({
-        error: 'Failed to search candidates: ' + error.message,
-      });
+        handleError(res, error)
     }
-  };
+};
 
 // Update a candidate by ID
 const updateCandidateController = async (req, res) => {
     try {
-        const { id } = req.params;
+        const candidate = req.candidate;
+        const candidate_id = candidate.id
         const updateData = req.body;
-        const updatedCandidate = await candidateService.updateCandidate(id, updateData);
-        res.status(200).json(updatedCandidate);
+        const updatedCandidate = await candidateService.updateCandidate(candidate_id, updateData);
+        return res.status(200).json(updatedCandidate);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        handleError(res, error)
     }
 };
 
@@ -152,9 +158,9 @@ const deleteCandidateController = async (req, res) => {
     try {
         const { id } = req.params;
         await candidateService.deleteCandidate(id);
-        res.status(200).json({ message: 'Candidate deleted successfully' });
+        return res.status(200).json({ message: 'Candidate deleted successfully' });
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        handleError(res, error)
     }
 };
 
@@ -162,7 +168,8 @@ module.exports = {
     // createCandidateController,
     createCandidate,
     updatePhoneNumber,
-    storePinCode, 
+    updatePassword,
+    storePinCode,
     getCandidateByIdController,
     getAllCandidatesController,
     searchCandidatesController,

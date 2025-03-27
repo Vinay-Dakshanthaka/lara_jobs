@@ -1,121 +1,247 @@
+// import { useState } from "react";
+// import EmailInput from "./EmailInput";
+// import OtpInput from "./OtpInput";
+// import ResendOtp from "./ResendOtp";
+// import PhoneForm from "./PhoneForm";
+// import PasswordForm from "./PasswordForm";
+// import { createCandidate } from "../../api/candidate";
+// import { resendEmailOtp, verifyOtp } from "../../api/auth";
+// import { useNavigate } from "react-router-dom";
+// import toast from "react-hot-toast";
+
+// const EmailForm = ({ onOtpVerified }) => {
+//   const [otpSent, setOtpSent] = useState(false);
+//   const [otpVerified, setOtpVerified] = useState(false);
+//   const [errorMessage, setErrorMessage] = useState("");
+//   const [loading, setLoading] = useState(false);
+//   const [resendLoading, setResendLoading] = useState(false);
+//   const [email, setEmail] = useState("");
+//   const [emailVerified, setEmailVerified] = useState(false);
+//   const [phoneVerified, setPhoneVerified] = useState(false); // Add state for phone verification
+//   const navigate = useNavigate();
+
+//   const handleSubmitEmail = async (email) => {
+//     try {
+//       setErrorMessage("");
+//       setLoading(true);
+
+//       const response = await createCandidate(email);
+
+//       if (response.status === 201 ) {
+//         setEmail(email);
+//         setOtpSent(true);
+//       }
+//     } catch (error) {
+//       if (error.response && error.response.data.code === 'EMAIL_ALREADY_EXISTS') {
+//         // setErrorMessage("An account with this email ID exists");
+//         localStorage.setItem('email', email);
+//         toast.error('Account exist with this email. Please Login');
+//         navigate('/signin')
+//       } else {
+//         toast.error('Error sending OTP. Please try again.')
+//         setErrorMessage("Error sending OTP. Please try again.");
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleVerifyOtp = async (otp) => {
+//     try {
+//       setErrorMessage("");
+//       setLoading(true);
+
+//       await verifyOtp(email, otp);
+//       setOtpVerified(true);
+//       setEmailVerified(true); // Mark email as verified
+//       localStorage.setItem('email', email);
+//       onOtpVerified();
+//     } catch (error) {
+//       setErrorMessage("Invalid OTP or expired");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleResendOtp = async () => {
+//     try {
+//       setResendLoading(true);
+//       const response = await resendEmailOtp(email);
+
+//       if (response.status === 200) {
+//         setErrorMessage("OTP has been resent to your email.");
+//       }
+//     } catch (error) {
+//       setErrorMessage("Error resending OTP. Please try again.");
+//     } finally {
+//       setResendLoading(false);
+//     }
+//   };
+
+//   const handlePhoneVerified = () => {
+//     setPhoneVerified(true); // Set phoneVerified to true once phone is verified
+//   };
+
+//   return (
+//     <div className="flex justify-center items-center h-screen">
+//       <div className="w-full max-w-sm p-6 border rounded-lg">
+//         {!otpSent ? (
+//           <EmailInput
+//             handleSubmitEmail={handleSubmitEmail}
+//             loading={loading}
+//             errorMessage={errorMessage}
+//           />
+//         ) : !otpVerified ? (
+//           <>
+//             <OtpInput
+//               handleVerifyOtp={handleVerifyOtp}
+//               loading={loading}
+//               errorMessage={errorMessage}
+//             />
+//             <ResendOtp
+//               handleResendOtp={handleResendOtp}
+//               resendLoading={resendLoading}
+//             />
+//           </>
+//         ) : emailVerified ? (
+//           !phoneVerified ? (
+//             <PhoneForm
+//               onPhoneVerified={handlePhoneVerified}
+//               email={email}
+//             />
+//           ) : (
+//             <PasswordForm />
+//           )
+//         ) : null}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default EmailForm;
+
+
 import { useState } from "react";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { sendOtp, verifyOtp } from "../../api/auth";
-import { ArrowLeftCircleIcon, ArrowLeftIcon } from "@heroicons/react/16/solid";
+import EmailInput from "./EmailInput";
+import OtpInput from "./OtpInput";
+import ResendOtp from "./ResendOtp";
+import PhoneForm from "./PhoneForm";
+import PasswordForm from "./PasswordForm";
+import { createCandidate } from "../../api/candidate";
+import { resendEmailOtp, verifyOtp } from "../../api/auth";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import UpdateCandidateForm from "../candidate/profileDetails/UpdateCandidateForm";
 
 const EmailForm = ({ onOtpVerified }) => {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");  // For API error message
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false); // Add state for phone verification
+  const [passwordUpdated, setPasswordUpdated] = useState(false); // Add state to track password update
+  const navigate = useNavigate();
 
-  // Email validation schema with Yup
-  const emailValidationSchema = Yup.object({
-    email: Yup.string().email("Invalid email format").required("Email is required"),
-  });
-
-  // OTP validation schema with Yup
-  const otpValidationSchema = Yup.object({
-    otp : Yup.string().length(6,'Enter 6 digit OTP sent your email').required('OTP required'),
-  })
-
-  const handleSubmitEmail = async (values) => {
+  const handleSubmitEmail = async (email) => {
     try {
-      setErrorMessage("");  
-      await sendOtp(values.email);
-      setOtpSent(true); 
+      setErrorMessage("");
+      setLoading(true);
+
+      const response = await createCandidate(email);
+
+      if (response.status === 201 ) {
+        setEmail(email);
+        setOtpSent(true);
+      }
     } catch (error) {
-      setErrorMessage("Error sending OTP. Please try again.");
+      if (error.response && error.response.data.code === 'EMAIL_ALREADY_EXISTS') {
+        localStorage.setItem('email', email);
+        toast.error('Account exist with this email. Please Login');
+        navigate('/signin')
+      } else {
+        toast.error('Error sending OTP. Please try again.')
+        setErrorMessage("Error sending OTP. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleVerifyOtp = async (values) => {
+  const handleVerifyOtp = async (otp) => {
     try {
-      setErrorMessage("");  // Reset error message
-      await verifyOtp(values.email, values.otp);
+      setErrorMessage("");
+      setLoading(true);
+
+      await verifyOtp(email, otp);
       setOtpVerified(true);
+      setEmailVerified(true); // Mark email as verified
+      localStorage.setItem('email', email);
       onOtpVerified();
     } catch (error) {
-      setErrorMessage("Invalid OTP. Please try again.");
+      setErrorMessage("Invalid OTP or expired");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      setResendLoading(true);
+      const response = await resendEmailOtp(email);
+
+      if (response.status === 200) {
+        setErrorMessage("OTP has been resent to your email.");
+      }
+    } catch (error) {
+      setErrorMessage("Error resending OTP. Please try again.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handlePhoneVerified = () => {
+    setPhoneVerified(true); // Set phoneVerified to true once phone is verified then render the next component 
+  };
+
+  const handlePasswordUpdated = () => {
+    setPasswordUpdated(true); // Set passwordUpdated to true once the password is updated 
   };
 
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="w-full max-w-sm p-6 border rounded-lg">
         {!otpSent ? (
-          <Formik
-            initialValues={{ email: "" }}
-            validationSchema={emailValidationSchema}  // Add validation schema
-            onSubmit={handleSubmitEmail}
-          >
-            {({ values }) => (
-              <Form>
-                <div className="mb-4">
-                  <Field
-                    type="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    className="w-full px-4 py-2 border rounded-md"
-                    value={values.email}  // Ensure value is controlled
-                  />
-                  <div className="text-red-500 text-sm">
-                    <ErrorMessage name="email" />
-                  </div>
-                </div>
-                {errorMessage && <div className="text-red-500 text-sm">{errorMessage}</div>}
-                <button
-                  type="submit"
-                  className="w-full bg-blue-500 text-white py-2 rounded-md"
-                >
-                  Send OTP
-                </button>
-              </Form>
-            )}
-          </Formik>
+          <EmailInput
+            handleSubmitEmail={handleSubmitEmail}
+            loading={loading}
+            errorMessage={errorMessage}
+          />
         ) : !otpVerified ? (
           <>
-            <Formik
-              initialValues={{ otp: "" }}
-              validationSchema={otpValidationSchema}  // Add OTP validation schema
-              onSubmit={handleVerifyOtp}
-            >
-              {({ values }) => (
-                <Form>
-                  <div className="mb-4">
-                    <Field
-                      type="text"
-                      name="otp"
-                      placeholder="Enter OTP"
-                      className="w-full px-4 py-2 border rounded-md"
-                      value={values.otp}  // Ensure value is controlled
-                    />
-                    <div className="text-red-500 text-sm">
-                      <ErrorMessage name="otp" />
-                    </div>
-                  </div>
-                  {errorMessage && <div className="text-red-500 text-sm">{errorMessage}</div>}
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white py-2 rounded-md"
-                  >
-                    Verify OTP
-                  </button>
-                </Form>
-              )}
-            </Formik>
-            <div>
-              <button
-                onClick={() => {
-                  setOtpSent(false);
-                  setOtpVerified(false);
-                }}
-                className="w-8 mt-4 bg-gray-500 text-white rounded-md text-center mx-auto"
-              >
-                <ArrowLeftIcon />
-              </button>
-            </div>
+            <OtpInput
+              handleVerifyOtp={handleVerifyOtp}
+              loading={loading}
+              errorMessage={errorMessage}
+            />
+            <ResendOtp
+              handleResendOtp={handleResendOtp}
+              resendLoading={resendLoading}
+            />
           </>
+        ) : emailVerified ? (
+          !phoneVerified ? (
+            <PhoneForm
+              onPhoneVerified={handlePhoneVerified}
+              email={email}
+            />
+          ) : passwordUpdated ? (
+            <UpdateCandidateForm /> 
+          ) : (
+            <PasswordForm onPasswordUpdated={handlePasswordUpdated} />
+          )
         ) : null}
       </div>
     </div>

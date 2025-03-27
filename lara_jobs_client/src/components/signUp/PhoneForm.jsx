@@ -1,27 +1,35 @@
 import { useState } from "react";
 import { Formik, Field, Form } from "formik";
-import { sendPhoneOtp, verifyPhoneOtp } from "../../api/auth";
+import { sendPhoneOtp } from "../../api/auth";
+import toast from "react-hot-toast";
 
-const PhoneForm = ({ onPhoneVerified }) => {
+const PhoneForm = ({ onPhoneVerified, email }) => {
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
 
-  const handleSubmitPhone = async (values) => {
+  const handleSubmitPhone = async (values, { resetForm }) => {
     try {
-      await sendPhoneOtp(values.phone);
+      await sendPhoneOtp(email, values.phone);
       setOtpSent(true);
       setPhone(values.phone);
+      resetForm();
     } catch (error) {
-      console.error("Error sending OTP", error);
+      if (error.response && error.response.data.code === 'EMAIL_ALREADY_EXISTS') {
+       toast.error('Phone number is alredy registered.')
+      }else{
+        console.error("Error sending OTP", error);
+      }
     }
   };
 
   const handleVerifyPhoneOtp = async (values) => {
     try {
-      await verifyPhoneOtp(phone, values.otp);
-      setOtpVerified(true);
-      onPhoneVerified();
+      // Simulating OTP verification
+      if (values.otp === "123456") {
+        setOtpVerified(true);
+        onPhoneVerified();
+      }
     } catch (error) {
       console.error("Error verifying OTP", error);
     }
@@ -30,6 +38,7 @@ const PhoneForm = ({ onPhoneVerified }) => {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="w-full max-w-sm p-6 border rounded-lg">
+        {/* Phone Number Form */}
         {!otpSent ? (
           <Formik
             initialValues={{ phone: "" }}
@@ -53,6 +62,7 @@ const PhoneForm = ({ onPhoneVerified }) => {
             </Form>
           </Formik>
         ) : !otpVerified ? (
+          // OTP Verification Form
           <Formik
             initialValues={{ otp: "" }}
             onSubmit={handleVerifyPhoneOtp}

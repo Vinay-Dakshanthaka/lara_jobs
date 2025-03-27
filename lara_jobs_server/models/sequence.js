@@ -1,10 +1,8 @@
-// sequence.js
 const { Model, DataTypes } = require('sequelize');
 const { createDatabaseIfNotExists } = require('../config/dbConfig');
 
-// Define a model for managing the sequence numbers for each day
 const initializeSequelize = async () => {
-  const sequelize = await createDatabaseIfNotExists(); // Get the sequelize instance
+  const sequelize = await createDatabaseIfNotExists(); 
 
   class Sequence extends Model {}
 
@@ -25,7 +23,7 @@ const initializeSequelize = async () => {
       sequelize,
       modelName: 'Sequence',
       tableName: 'sequences',
-      timestamps: false, // No timestamps needed for the sequence table
+      timestamps: false,
     }
   );
 };

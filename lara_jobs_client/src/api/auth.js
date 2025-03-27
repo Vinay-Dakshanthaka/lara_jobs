@@ -1,3 +1,6 @@
+import axios from "axios";
+import { baseURL } from "../config/baseURL";
+
 export const sendOtp = async (email) => {
   try {
     return "sendOtp"
@@ -9,16 +12,40 @@ export const sendOtp = async (email) => {
 
 export const verifyOtp = async (email, otp) => {
   try {
-    return "verifyOtp"
+
+    const response = await axios.post(`${baseURL}/api/auth/verify-email-otp`, {
+      email: email,
+      otp : otp
+    });
+
+    return response;
   } catch (error) {
     console.error("Error verifying OTP", error);
     throw new Error("Invalid OTP");
   }
 };
 
-export const sendPhoneOtp = async (phone) => {
+export const resendEmailOtp = async (email, otp) => {
   try {
-    return "sendPhoneOtp"
+
+    const response = await axios.post(`${baseURL}/api/auth/resend-email-otp`, {
+      email: email,
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Error while resending the OTP : ", error);
+    throw new Error("Invalid OTP");
+  }
+};
+
+export const sendPhoneOtp = async (email, phone) => {
+  try {
+    const response = await axios.post(`${baseURL}/api/candidate/updat-phone`, {
+      email: email,
+      phoneNumber : phone
+    });
+    return response;
   } catch (error) {
     console.error("Error sending phone OTP", error);
     throw new Error("Unable to send OTP");
@@ -27,9 +54,34 @@ export const sendPhoneOtp = async (phone) => {
 
 export const verifyPhoneOtp = async (phone, otp) => {
   try {
-  return "verifyPhoneOtp"
+    return "verifyPhoneOtp"
   } catch (error) {
     console.error("Error verifying phone OTP", error);
     throw new Error("Invalid OTP");
+  }
+};
+
+
+export const sendResetPasswordEmail = async (email) => {
+  try {
+    return 'email sent '
+  } catch (error) {
+    console.error("Error while sending email", error);
+    throw new Error("Error while sending forgot password mail");
+  }
+};
+
+export const signInUser = async (email, password) => {
+  try {
+    console.log(`Received email ${email} : password : ${password}`)
+    const response = await axios.post(`${baseURL}/api/auth/login`, {
+      email: email, 
+      password: password
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Error while log in", error);
+    throw new Error("Login Failed");
   }
 };

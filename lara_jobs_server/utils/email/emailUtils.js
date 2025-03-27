@@ -37,7 +37,7 @@ const sendEmailOTP = async (email) => {
         `;
 
         const mailOptions = {
-            from: process.env.EMAIL_USER,  // Sender's email
+            from: process.env.EMAIL_USERNAME,  
             to: email,  // Recipient's email
             subject: 'Your verification OTP Code from Lara Jobs',
             html: htmlContent,  

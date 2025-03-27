@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/dbConfig"); 
+const { sequelize } = require("../config/dbConfig");
 
-const Candidate = sequelize.define('Candidate', {
+const Candidate = sequelize.define("Candidate", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -33,16 +33,6 @@ const Candidate = sequelize.define('Candidate', {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
-    defaultValue: function () {
-      // Generate unique_id as YYYYMMDD#### (with sequence number)
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-      const day = String(today.getDate()).padStart(2, '0');
-      
-      // Sequence number: find the last number for today
-      return `${year}${month}${day}0001`; // Initially, the sequence is 0001
-    },
   },
   email_verified: {
     type: DataTypes.BOOLEAN,
@@ -56,8 +46,18 @@ const Candidate = sequelize.define('Candidate', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  role: {
+    type: DataTypes.ENUM,
+    values: ['CANDIDATE', 'ADMIN'], 
+    defaultValue: 'CANDIDATE', 
+    allowNull: false,
+  },
+  image_url: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 }, {
-  tableName: 'candidates',
+  tableName: "candidates",
   timestamps: true,
 });
 

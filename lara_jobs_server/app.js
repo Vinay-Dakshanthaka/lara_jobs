@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { initDatabase } = require('./models');
 const app = express();
 
@@ -9,6 +10,9 @@ const authRoutes = require('./routes/authRoutes')
 const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
+app.use(cors({
+    origin: `http://localhost:5173`, 
+}));
 
 app.use('/api', candidateRoutes);
 app.use('/api/auth', authRoutes);
