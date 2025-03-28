@@ -119,6 +119,7 @@ const loginCandidate = async (email, password) => {
             email: candidate.email,
             unique_id: candidate.unique_id,
             id: candidate.id,
+            role: candidate.role,
         };
 
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' }); //token expires after 7 days

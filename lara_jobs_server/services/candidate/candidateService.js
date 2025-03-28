@@ -4,6 +4,7 @@ const CustomError = require('../../errors/CustomErrors');
 const Candidate = require('../../models/candidate');
 const OTPVerification = require('../../models/otpVerfication')
 const { sendEmailOTP } = require('../../utils/email/emailUtils');
+const { sendPhoneOTP } = require('../../utils/phoneOTP/phoneUtils');
 
 // Create a new candidate
 // const createCandidate = async (candidateData) => {
@@ -20,22 +21,35 @@ const createCandidate = async (email) => {
         // Check if a candidate with the same email already exists
         const existingCandidate = await Candidate.findOne({ where: { email } });
         if (existingCandidate) {
-            //candidate exist but the email is not verified 
+            // Candidate exists but the email is not verified
             if (!existingCandidate.email_verified) {
                 const otp = await sendEmailOTP(existingCandidate.email);
-                await OTPVerification.create({
-                    candidate_id: candidate.id,
-                    otp_email: otp,
-                    otp_email_sent_at: new Date().toISOString(),
-                });
+
+                // Check if OTPVerification record exists for this candidate
+                const existingOTP = await OTPVerification.findOne({ where: { candidate_id: existingCandidate.id } });
+
+                if (existingOTP) {
+                    // Update the existing OTP record for email OTP
+                    await existingOTP.update({
+                        otp_email: otp,
+                        otp_email_sent_at: new Date().toISOString(),
+                    });
+                } else {
+                    // Create a new OTPVerification record if it doesn't exist
+                    await OTPVerification.create({
+                        candidate_id: existingCandidate.id,
+                        otp_email: otp,
+                        otp_email_sent_at: new Date().toISOString(),
+                    });
+                }
 
                 return existingCandidate;
             }
-            //candidate exists email verified 
+            // Candidate exists and email is verified
             throw new CustomError('A candidate with this email already exists.', 'EMAIL_ALREADY_EXISTS');
         }
 
-        // Get the current date to generate unique_id (YYYYMMDD format)
+        // Get the current date to generate a unique_id (YYYYMMDD format)
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -71,11 +85,24 @@ const createCandidate = async (email) => {
 
         // Generate and send OTP email
         const otp = await sendEmailOTP(candidate.email);
-        await OTPVerification.create({
-            candidate_id: candidate.id,
-            otp_email: otp,
-            otp_email_sent_at: new Date().toISOString(),
-        });
+
+        // Check if OTPVerification record exists for this candidate
+        const existingOTP = await OTPVerification.findOne({ where: { candidate_id: candidate.id } });
+
+        if (existingOTP) {
+            // Update the existing OTP record for email OTP
+            await existingOTP.update({
+                otp_email: otp,
+                otp_email_sent_at: new Date().toISOString(),
+            });
+        } else {
+            // Create a new OTPVerification record if it doesn't exist
+            await OTPVerification.create({
+                candidate_id: candidate.id,
+                otp_email: otp,
+                otp_email_sent_at: new Date().toISOString(),
+            });
+        }
 
         return candidate;
     } catch (error) {
@@ -163,22 +190,35 @@ const updatePhoneNumber = async (email, phoneNumber) => {
             throw new CustomError('Candidate with this email does not exist.', 'NOT_FOUND');
         }
 
-        if(candidate.phone_number === phoneNumber){
-            throw new CustomError('Phone number alredy registered.', 'DUPLICATE_PHONE_NUMBER');
+        if (candidate.phone_number === phoneNumber) {
+            throw new CustomError('Phone number already registered.', 'DUPLICATE_PHONE_NUMBER');
         }
 
         await Candidate.update(
-            { phone_number: phoneNumber },
+            { phone_number: `91${phoneNumber}` },
             { where: { id: candidate.id } }
         );
 
-        // Send phone OTP
-        // const otp = await sendPhoneOTP(phoneNumber); 
-        // await OTPVerification.create({
-        //     candidate_id: candidate.id,
-        //     otp_phone: otp,
-        //     otp_phone_sent_at: new Date(),
-        // });
+        // Generate OTP
+        const otp = await sendPhoneOTP(phoneNumber);
+
+        // Check if OTPVerification record exists for this candidate
+        const existingOTP = await OTPVerification.findOne({ where: { candidate_id: candidate.id } });
+
+        if (existingOTP) {
+            // Update the existing OTP record
+            await existingOTP.update({
+                otp_phone: otp,
+                otp_phone_sent_at: new Date(),
+            });
+        } else {
+            // Create a new OTPVerification record if it doesn't exist
+            await OTPVerification.create({
+                candidate_id: candidate.id,
+                otp_phone: otp,
+                otp_phone_sent_at: new Date(),
+            });
+        }
 
         return candidate;
     } catch (error) {
@@ -190,7 +230,7 @@ const updatePhoneNumber = async (email, phoneNumber) => {
         if (error.code === 'NOT_FOUND') {
             throw new CustomError(error.message, error.code);
         }
-        
+
         if (error.code === 'DUPLICATE_PHONE_NUMBER') {
             throw new CustomError(error.message, error.code);
         }

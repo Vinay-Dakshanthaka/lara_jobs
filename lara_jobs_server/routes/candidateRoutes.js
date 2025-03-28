@@ -1,6 +1,7 @@
 const express = require('express');
 const candidateController = require('../controllers/candidate/candidateController');
 const verifyJwt = require('../middlewares/jwtMiddleware');
+const checkRole = require('../middlewares/checkRole');
 
 const candidateRoutes = express.Router();
 
@@ -11,7 +12,7 @@ const candidateRoutes = express.Router();
 candidateRoutes.post('/candidate/create', candidateController.createCandidate);
 
 //save phone number
-candidateRoutes.post('/candidate/updat-phone', candidateController.updatePhoneNumber);
+candidateRoutes.post('/candidate/update-phone', candidateController.updatePhoneNumber);
 
 //update password
 candidateRoutes.post('/candidate/update-password', candidateController.updatePassword);
@@ -26,7 +27,7 @@ candidateRoutes.get('/candidates/:id', candidateController.getCandidateByIdContr
 candidateRoutes.get('/candidates', candidateController.getAllCandidatesController);
 
 // Update a candidate by ID
-candidateRoutes.put('/candidate/update', verifyJwt, candidateController.updateCandidateController);
+candidateRoutes.put('/candidate/update', candidateController.updateCandidateController);
 
 // Delete a candidate by ID
 candidateRoutes.delete('/candidates/:id', candidateController.deleteCandidateController);

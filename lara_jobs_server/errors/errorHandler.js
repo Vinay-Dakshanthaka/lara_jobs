@@ -10,6 +10,7 @@ const errorCodes = {
     'INVALID_OTP': { status: 400, message: 'The OTP you entered is invalid. Please try again.' },
     'EMAIL_NOT_VERIFIED': { status: 400, message: 'Email exists, but OTP verification is pending.' },
     'INVALID_CREDENTIALS': { status: 401, message: 'Invalid Credentials.' },
+    'SUBJECT_ALREADY_EXISTS': { status: 409, message: 'Subject Already exists.' },
 };
 
 const handleError = (res, error) => {

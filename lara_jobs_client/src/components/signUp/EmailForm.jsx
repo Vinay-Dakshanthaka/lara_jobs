@@ -152,7 +152,7 @@ const EmailForm = ({ onOtpVerified }) => {
 
       const response = await createCandidate(email);
 
-      if (response.status === 201 ) {
+      if (response.status === 201) {
         setEmail(email);
         setOtpSent(true);
       }
@@ -211,40 +211,43 @@ const EmailForm = ({ onOtpVerified }) => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="w-full max-w-sm p-6 border rounded-lg">
-        {!otpSent ? (
-          <EmailInput
-            handleSubmitEmail={handleSubmitEmail}
-            loading={loading}
-            errorMessage={errorMessage}
-          />
-        ) : !otpVerified ? (
-          <>
-            <OtpInput
-              handleVerifyOtp={handleVerifyOtp}
+    <>
+      <div className="flex justify-center items-center h-screen">
+        <div className="w-full max-w-sm p-6 border rounded-lg">
+          {!otpSent ? (
+            <EmailInput
+              handleSubmitEmail={handleSubmitEmail}
               loading={loading}
               errorMessage={errorMessage}
             />
-            <ResendOtp
-              handleResendOtp={handleResendOtp}
-              resendLoading={resendLoading}
-            />
-          </>
-        ) : emailVerified ? (
-          !phoneVerified ? (
-            <PhoneForm
-              onPhoneVerified={handlePhoneVerified}
-              email={email}
-            />
-          ) : passwordUpdated ? (
-            <UpdateCandidateForm /> 
-          ) : (
-            <PasswordForm onPasswordUpdated={handlePasswordUpdated} />
-          )
-        ) : null}
+          ) : !otpVerified ? (
+            <>
+              <OtpInput
+                handleVerifyOtp={handleVerifyOtp}
+                loading={loading}
+                errorMessage={errorMessage}
+              />
+              <ResendOtp
+                handleResendOtp={handleResendOtp}
+                resendLoading={resendLoading}
+              />
+            </>
+          ) : emailVerified ? (
+            !phoneVerified ? (
+              <PhoneForm
+                onPhoneVerified={handlePhoneVerified}
+                email={email}
+              />
+            ) : passwordUpdated ? (
+              <UpdateCandidateForm />
+            ) : (
+              <PasswordForm onPasswordUpdated={handlePasswordUpdated} />
+            )
+          ) : null}
+        </div>
       </div>
-    </div>
+        <UpdateCandidateForm />
+    </>
   );
 };
 

@@ -92,7 +92,7 @@ function App() {
               />
 
               {/*redirect to login if path doesn't match */}
-              <Route path="*" element={<Navigate to="/signin" />} />
+              <Route path="*" element={<Navigate to="/signup" />} />
             </Routes>
           </Suspense>
         </Router>

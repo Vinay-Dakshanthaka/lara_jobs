@@ -48,11 +48,23 @@ const Candidate = sequelize.define("Candidate", {
   },
   role: {
     type: DataTypes.ENUM,
-    values: ['CANDIDATE', 'ADMIN'], 
-    defaultValue: 'CANDIDATE', 
+    values: ['CANDIDATE', 'ADMIN'],
+    defaultValue: 'CANDIDATE',
     allowNull: false,
   },
   image_url: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  town: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  district: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  state: {
     type: DataTypes.STRING,
     allowNull: true,
   },
