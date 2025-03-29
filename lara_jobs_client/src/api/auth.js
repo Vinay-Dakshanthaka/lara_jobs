@@ -39,15 +39,15 @@ export const resendEmailOtp = async (email, otp) => {
   }
 };
 
-export const sendPhoneOtp = async (email, phone) => {
+export const savePhoneNumber = async (email, phone) => {
   try {
-    const response = await axios.post(`${baseURL}/api/candidate/updat-phone`, {
+    const response = await axios.post(`${baseURL}/api/candidate/update-phone`, {
       email: email,
       phoneNumber : phone
     });
     return response;
   } catch (error) {
-    console.error("Error sending phone OTP", error);
+    console.error("Error saving phone number ", error);
     throw new Error("Unable to send OTP");
   }
 };

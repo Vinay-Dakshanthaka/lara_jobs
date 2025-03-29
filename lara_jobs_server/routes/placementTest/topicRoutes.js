@@ -1,0 +1,20 @@
+const express = require('express')
+const topicRoutes = express.Router();
+
+const topicController = require('../../controllers/placementTest/topicController')
+
+topicRoutes.post('/create', topicController.createTopic);
+
+topicRoutes.put('/:topic_id', topicController.updateTopic);
+
+topicRoutes.get('/:topic_id', topicController.getTopicById);
+
+topicRoutes.get('/get-all-topics', topicController.getAllTopics);
+
+topicRoutes.delete('/:topic_id', topicController.deleteTopic);
+
+topicRoutes.get('/topics-by-subject/:subject_id', topicController.getTopicsBySubjectId);
+
+
+
+module.exports = topicRoutes

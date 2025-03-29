@@ -181,15 +181,32 @@ const UpdateCandidateForm = () => {
     // Function to handle the form submission
     const handleSubmit = async (values) => {
         const token = localStorage.getItem('token');
+        const email = localStorage.getItem('email');
+
         if (!token) {
             setErrorMessage('Authorization token is missing.');
             return;
         }
 
+        if (!email) {
+            setErrorMessage('Email is missing.');
+            return;
+        }
+
+        const updatedValues = {
+            ...values,
+            email,
+        };
+
         try {
-            const response = await updateCandidateBasicDetails(values);
+            const response = await updateCandidateBasicDetails(updatedValues);
             toast.success('Updated your details');
             setSuccessMessage('Details updated successfully!');
+            localStorage.removeItem('email');
+            localStorage.removeItem('role');
+            localStorage.removeItem('token');
+            localStorage.removeItem('candidate_id');
+
             navigate('/signin');
             setErrorMessage('');
         } catch (error) {
@@ -198,6 +215,7 @@ const UpdateCandidateForm = () => {
             setSuccessMessage('');
         }
     };
+
 
     return (
         <div className="flex justify-center items-center h-screen">
@@ -291,9 +309,9 @@ const UpdateCandidateForm = () => {
                                     type="text"
                                     id="district"
                                     name="district"
-                                    value={values.district || locationDetails.district} 
+                                    value={values.district || locationDetails.district}
                                     onChange={handleChange}
-                                    onBlur={() => setFieldTouched('district', true)} 
+                                    onBlur={() => setFieldTouched('district', true)}
                                     className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="District"
                                 />
@@ -308,9 +326,9 @@ const UpdateCandidateForm = () => {
                                     type="text"
                                     id="state"
                                     name="state"
-                                    value={values.state || locationDetails.state} 
+                                    value={values.state || locationDetails.state}
                                     onChange={handleChange}
-                                    onBlur={() => setFieldTouched('state', true)} 
+                                    onBlur={() => setFieldTouched('state', true)}
                                     className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="State"
                                 />

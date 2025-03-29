@@ -128,7 +128,8 @@ const loginCandidate = async (email, password) => {
         return {
             unique_id : candidate.unique_id, 
             token,
-            role: candidate.role
+            role: candidate.role, 
+            emailId : candidate.email
         };
     } catch (error) {
         console.log('Login error: ', error);

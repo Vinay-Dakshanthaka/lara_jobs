@@ -200,25 +200,25 @@ const updatePhoneNumber = async (email, phoneNumber) => {
         );
 
         // Generate OTP
-        const otp = await sendPhoneOTP(phoneNumber);
+        // const otp = await sendPhoneOTP(phoneNumber);
 
         // Check if OTPVerification record exists for this candidate
-        const existingOTP = await OTPVerification.findOne({ where: { candidate_id: candidate.id } });
+        // const existingOTP = await OTPVerification.findOne({ where: { candidate_id: candidate.id } });
 
-        if (existingOTP) {
-            // Update the existing OTP record
-            await existingOTP.update({
-                otp_phone: otp,
-                otp_phone_sent_at: new Date(),
-            });
-        } else {
-            // Create a new OTPVerification record if it doesn't exist
-            await OTPVerification.create({
-                candidate_id: candidate.id,
-                otp_phone: otp,
-                otp_phone_sent_at: new Date(),
-            });
-        }
+        // if (existingOTP) {
+        //     // Update the existing OTP record
+        //     await existingOTP.update({
+        //         otp_phone: otp,
+        //         otp_phone_sent_at: new Date(),
+        //     });
+        // } else {
+        //     // Create a new OTPVerification record if it doesn't exist
+        //     await OTPVerification.create({
+        //         candidate_id: candidate.id,
+        //         otp_phone: otp,
+        //         otp_phone_sent_at: new Date(),
+        //     });
+        // }
 
         return candidate;
     } catch (error) {
@@ -288,16 +288,18 @@ const storePinCode = async (candidateId, pinCode) => {
 };
 
 
-// Get a candidate by ID
 const getCandidateById = async (id) => {
     try {
         const candidate = await Candidate.findByPk(id);
+        
         if (!candidate) {
             throw new CustomError('Candidate not found', 'NOT_FOUND');
         }
-        return candidate;
-    } catch (error) {
 
+        const { password, ...candidateWithoutPassword } = candidate.toJSON();
+        
+        return candidateWithoutPassword;
+    } catch (error) {
         if (error.name === 'SequelizeDatabaseError') {
             throw new CustomError('Database error occurred', 'DATABASE_ERROR');
         }
@@ -395,6 +397,30 @@ const updateCandidate = async (id, updateData) => {
     }
 };
 
+const updateCandidateByEmail = async (updateData) => {
+    try {
+        const candidate = await Candidate.findOne({
+            where : {email : updateData.email}
+        });
+        if (!candidate) {
+            throw new CustomError('Candidate not found', 'NOT_FOUND');
+        }
+        await candidate.update(updateData);
+        return candidate;
+    } catch (error) {
+
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        if (error.code === 'NOT_FOUND') {
+            throw new CustomError(error.message, error.code);
+        }
+
+        throw new CustomError('Error updating candidate: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
+
 // Delete a candidate by ID
 const deleteCandidate = async (id) => {
     try {
@@ -433,4 +459,5 @@ module.exports = {
     getAllCandidates,
     updateCandidate,
     deleteCandidate,
+    updateCandidateByEmail,
 };

@@ -39,12 +39,13 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         // console.log(`Email : ${email}, : password : ${password}`)
 
-       const {unique_id, token, role} = await authService.loginCandidate(email, password);
+       const {unique_id, token, role, emailId} = await authService.loginCandidate(email, password);
         return res.status(200).json({
             message : 'Login Success', 
             unique_id,
             token,
-            role
+            role, 
+            emailId
         });
     } catch (error) {
         console.log("Error while resending OTP:", error);

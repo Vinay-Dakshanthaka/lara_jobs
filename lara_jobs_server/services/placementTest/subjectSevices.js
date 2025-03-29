@@ -1,9 +1,10 @@
 const CustomError = require("../../errors/CustomErrors");
-const { Subject } = require("../../models");
+const { Subject, Topic } = require("../../models");
 
 
 const createSubject = async (name) => {
     try {
+        name = name.trim();
         const existingSubject = await Subject.findOne({ where: { name } });
         if (existingSubject) {
             throw new CustomError('A subject with this name already exists.', 'SUBJECT_ALREADY_EXISTS');
@@ -14,7 +15,7 @@ const createSubject = async (name) => {
         return subject;
     } catch (error) {
         console.log("error ", error);
-        
+
         if (error.name === 'SequelizeDatabaseError') {
             throw new CustomError('Database error occurred', 'DATABASE_ERROR');
         }
@@ -43,7 +44,7 @@ const getAllSubjects = async () => {
 
 const getSubjectById = async (subjectId) => {
     try {
-        const subject = await Subject.findByPk(subjectId);  
+        const subject = await Subject.findByPk(subjectId);
         if (!subject) {
             throw new CustomError('Subject not found', 'SUBJECT_NOT_FOUND');
         }
@@ -63,6 +64,7 @@ const getSubjectById = async (subjectId) => {
 
 const updateSubject = async (subjectId, name) => {
     try {
+        name = name.trim();
         const subject = await Subject.findByPk(subjectId);
         if (!subject) {
             throw new CustomError('Subject not found', 'SUBJECT_NOT_FOUND');
@@ -97,8 +99,8 @@ const deleteSubject = async (subjectId) => {
             throw new CustomError('Subject not found', 'SUBJECT_NOT_FOUND');
         }
 
-        await subject.destroy(); 
-        return { message: 'Subject deleted successfully' };
+        await subject.destroy();
+        return { message: 'Subject deleted successfully', };
     } catch (error) {
         console.log("Error while deleting subject: ", error);
         if (error.name === 'SequelizeDatabaseError') {
@@ -111,7 +113,26 @@ const deleteSubject = async (subjectId) => {
     }
 };
 
+const getAllSubjectsAndTopics = async () => {
+    try {
+        const subjectAndTopics = await Subject.findAll({
+            include: [
+                {
+                    model: Topic,
+                    as: 'topics'
+                }
+            ]
+        });
+        return subjectAndTopics;
+    } catch (error) {
+        console.log("Error while deleting subject and topics: ", error);
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred while deleting the subject', 'DATABASE_ERROR');
+        }
 
+        throw new CustomError('Error deleting subject: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+}
 
 module.exports = {
     createSubject,
@@ -119,4 +140,5 @@ module.exports = {
     getSubjectById,
     updateSubject,
     deleteSubject,
+    getAllSubjectsAndTopics
 }

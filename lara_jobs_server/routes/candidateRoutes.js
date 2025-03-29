@@ -21,13 +21,15 @@ candidateRoutes.post('/candidate/update-password', candidateController.updatePas
 candidateRoutes.post('/candidate/store-pin', candidateController.storePinCode);
 
 // Get a candidate by ID
-candidateRoutes.get('/candidates/:id', candidateController.getCandidateByIdController);
+candidateRoutes.get('/candidate', verifyJwt, candidateController.getCandidateByIdController);
 
 // Get all candidates
 candidateRoutes.get('/candidates', candidateController.getAllCandidatesController);
 
 // Update a candidate by ID
 candidateRoutes.put('/candidate/update', candidateController.updateCandidateController);
+
+candidateRoutes.put('/candidate/update-by-email', candidateController.updateCandidatebyEmailController);
 
 // Delete a candidate by ID
 candidateRoutes.delete('/candidates/:id', candidateController.deleteCandidateController);

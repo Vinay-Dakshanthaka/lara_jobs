@@ -141,8 +141,8 @@ const EmailForm = ({ onOtpVerified }) => {
   const [resendLoading, setResendLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
-  const [phoneVerified, setPhoneVerified] = useState(false); // Add state for phone verification
-  const [passwordUpdated, setPasswordUpdated] = useState(false); // Add state to track password update
+  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmitEmail = async (email) => {
@@ -159,10 +159,10 @@ const EmailForm = ({ onOtpVerified }) => {
     } catch (error) {
       if (error.response && error.response.data.code === 'EMAIL_ALREADY_EXISTS') {
         localStorage.setItem('email', email);
-        toast.error('Account exist with this email. Please Login');
-        navigate('/signin')
+        toast.error('Account exists with this email. Please Login');
+        navigate('/signin');
       } else {
-        toast.error('Error sending OTP. Please try again.')
+        toast.error('Error sending OTP. Please try again.');
         setErrorMessage("Error sending OTP. Please try again.");
       }
     } finally {
@@ -176,6 +176,7 @@ const EmailForm = ({ onOtpVerified }) => {
       setLoading(true);
 
       await verifyOtp(email, otp);
+      toast.success("Email Verified")
       setOtpVerified(true);
       setEmailVerified(true); // Mark email as verified
       localStorage.setItem('email', email);
@@ -203,17 +204,17 @@ const EmailForm = ({ onOtpVerified }) => {
   };
 
   const handlePhoneVerified = () => {
-    setPhoneVerified(true); // Set phoneVerified to true once phone is verified then render the next component 
+    setPhoneVerified(true);
   };
 
   const handlePasswordUpdated = () => {
-    setPasswordUpdated(true); // Set passwordUpdated to true once the password is updated 
+    setPasswordUpdated(true);
   };
 
   return (
     <>
-      <div className="flex justify-center items-center h-screen">
-        <div className="w-full max-w-sm p-6 border rounded-lg">
+      <div className="flex justify-center items-center h-screen bg-blue-50 dark:bg-blue-900">
+        <div className="w-full max-w-sm p-6 border rounded-lg bg-white dark:bg-blue-800">
           {!otpSent ? (
             <EmailInput
               handleSubmitEmail={handleSubmitEmail}
@@ -246,7 +247,7 @@ const EmailForm = ({ onOtpVerified }) => {
           ) : null}
         </div>
       </div>
-        <UpdateCandidateForm />
+
     </>
   );
 };

@@ -14,6 +14,7 @@ const OtpInput = ({ handleVerifyOtp, loading, errorMessage }) => {
     >
       {({ values, setFieldValue }) => (
         <Form>
+          <p className="text-success">An 6 digit OTP has been sent to your email Please verify </p>
           <div className="mb-4">
             <Field
               type="text"

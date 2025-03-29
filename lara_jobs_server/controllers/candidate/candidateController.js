@@ -88,7 +88,8 @@ const storePinCode = async (req, res) => {
 // Get a candidate by ID
 const getCandidateByIdController = async (req, res) => {
     try {
-        const { id } = req.params;
+        const id = req.candidate.id;
+        console.log("Id : ", id)
         const candidate = await candidateService.getCandidateById(id);
         return res.status(200).json(candidate);
     } catch (error) {
@@ -143,12 +144,21 @@ const searchCandidatesController = async (req, res) => {
 // Update a candidate by ID
 const updateCandidateController = async (req, res) => {
     try {
-        const candidate = req.candidate;
-        const candidate_id = candidate.id
         const updateData = req.body;
-        const updatedCandidate = await candidateService.updateCandidate(candidate_id, updateData);
+        const updatedCandidate = await candidateService.updateCandidate( updateData);
         return res.status(200).json(updatedCandidate);
     } catch (error) {
+        console.error('Error while updating candidate details : ', error)
+        handleError(res, error)
+    }
+};
+const updateCandidatebyEmailController = async (req, res) => {
+    try {
+        const updateData = req.body;
+        const updatedCandidate = await candidateService.updateCandidateByEmail(updateData);
+        return res.status(200).json(updatedCandidate);
+    } catch (error) {
+        console.error('Error while updating candidate details : ', error)
         handleError(res, error)
     }
 };
@@ -174,5 +184,6 @@ module.exports = {
     getAllCandidatesController,
     searchCandidatesController,
     updateCandidateController,
+    updateCandidatebyEmailController, 
     deleteCandidateController,
 };

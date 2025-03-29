@@ -45,13 +45,25 @@ export const updateCandidateBasicDetails = async (candidateDetails) => {
         }
 
         const response = await axios.put(
-            `${baseURL}/api/candidate/update`,
+            `${baseURL}/api/candidate/update-by-email`,
             candidateDetails,
             config
         );
 
         return response.data;
     } catch (error) {
+        console.error('Error while updating details : ', error)
         throw error;
     }
 };
+
+
+export const getCandidateDetails = async () => {
+    try {
+        const response = await axios.get(`${baseURL}/api/candidate`, config)
+        return response.data;
+    } catch (error) {
+        console.error("Error while fetching candidate data : ", error);
+        throw error;
+    }
+}

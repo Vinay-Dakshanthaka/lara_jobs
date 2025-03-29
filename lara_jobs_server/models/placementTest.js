@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/dbConfig'); 
-const CumulativeQuestion = require('./cumulativeQuestions');
 
 const PlacementTest = sequelize.define('PlacementTest', {
     placement_test_id: {

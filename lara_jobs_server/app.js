@@ -6,6 +6,9 @@ const app = express();
 
 const candidateRoutes = require('./routes/candidateRoutes');
 const authRoutes = require('./routes/authRoutes')
+const subjectRoutes = require('./routes/placementTest/subjectRoutes')
+const topicRoutes = require('./routes/placementTest/topicRoutes')
+
 
 const PORT = process.env.PORT || 3000;
 app.use(express.json());
@@ -16,6 +19,8 @@ app.use(cors({
 
 app.use('/api', candidateRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/placement-test/subject', subjectRoutes);
+app.use('/api/placement-test/topic', topicRoutes);
 
 
 initDatabase().then(async ()=>{

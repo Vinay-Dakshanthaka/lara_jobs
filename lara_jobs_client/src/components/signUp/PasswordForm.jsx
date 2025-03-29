@@ -143,6 +143,7 @@ import { updatePassword } from "../../api/candidate";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/16/solid";
 import { useNavigate } from "react-router-dom";
 import UpdateCandidateForm from "../candidate/profileDetails/UpdateCandidateForm";
+import toast from "react-hot-toast";
 
 const PasswordForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -158,6 +159,7 @@ const PasswordForm = () => {
     if (isSuccess) {
       const timeout = setTimeout(() => {
         setIsSuccess(false);
+        toast.success('Password updated Successfully ')
         setPasswordUpdated(true); // When password is updated, move to the next step
       }, 3000);
 
@@ -167,7 +169,7 @@ const PasswordForm = () => {
 
   const handleSubmit = async (values) => {
     if (values.password !== values.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
@@ -265,7 +267,7 @@ const PasswordForm = () => {
 
                 {isSuccess && (
                   <div className="mt-4 text-green-500">
-                    Password updated successfully! Redirecting to update your details...
+                    Password updated successfully! Please update your details 
                   </div>
                 )}
               </Form>
