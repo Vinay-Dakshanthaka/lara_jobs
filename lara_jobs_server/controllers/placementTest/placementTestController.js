@@ -46,8 +46,8 @@ const createPlacementTestController = async (req, res) => {
 
 const updatePlacementTestController = async (req, res) => {
     try {
+        const {test_id}  = req.params;
         const {
-            test_id,
             number_of_questions,
             description,
             start_time,
@@ -145,6 +145,36 @@ const deletePlacementTestController = async (req, res) => {
     }
 };
 
+const disableLinkController = async (req, res) => {
+    try {
+        const { test_id, is_Active } = req.body;
+
+        await placementTestService.updateTestLinkStatus(test_id, is_Active);
+
+        return res.status(200).send({
+            message: 'Test link status updated successfully',
+        });
+    } catch (error) {
+        console.error("Error while updating test link status:", error);
+        handleError(res, error);  
+    }
+};
+
+const updateMonitorStatus = async (req, res) => {
+    try {
+        const { test_id, is_Monitored } = req.body;
+
+        await placementTestService.updateIsMonitoredStatus(test_id, is_Monitored);
+
+        return res.status(200).send({
+            message: 'Monitoring status updated successfully',
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'An error occurred while updating the monitoring status' });
+    }
+};
 
 module.exports = {
     createPlacementTestController,
@@ -152,4 +182,6 @@ module.exports = {
     getPlacementTestByIdController,
     getAllPlacementTestsController,
     deletePlacementTestController,
+    disableLinkController,
+    updateMonitorStatus,
 };

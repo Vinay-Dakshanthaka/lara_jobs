@@ -1,5 +1,5 @@
 const CustomError = require('../../errors/CustomErrors');
-const { Topic } = require('../../models');
+const { Topic, Subject, PlacementTestTopic } = require('../../models');
 const subjectService = require('./subjectSevices')
 
 const createTopic = async (name, subjectId) => {
@@ -119,7 +119,6 @@ const deleteTopic = async (topicId) => {
 
 const getTopicsBySubjectId = async (subjectId) => {
     try {
-        // First, check if the subject exists using the getSubjectById method
         const subject = await subjectService.getSubjectById(subjectId);
 
         if (!subject) {
@@ -152,6 +151,59 @@ const getTopicsBySubjectId = async (subjectId) => {
     }
 };
 
+const getTopicsByPlacementTestId = async (placementTestId) => {
+    try {
+        const topics = await PlacementTestTopic.findAll({
+            where: { placement_test_id: placementTestId },
+            include: [
+                {
+                    model: Topic,
+                    as: 'Topics',
+                    include: [
+                        {
+                            model: Subject,
+                            as: 'subject',
+                            attributes: ['subject_id', 'name']
+                        }
+                    ],
+                    attributes: ['topic_id', 'name']
+                }
+            ],
+            attributes: []
+        });
+
+        if (!topics || topics.length === 0) {
+            throw new CustomError('No topics found for the given placement test ID.', 'NO_TOPICS_FOUND');
+        }
+
+        const topicDetails = topics.map(topicEntry => {
+            const topicData = topicEntry.Topics;
+            if (!topicData) return null;
+
+            return {
+                topic_id: topicData.topic_id,
+                topic_name: topicData.name,
+                subject_id: topicData.subject.subject_id,
+                subject_name: topicData.subject.name
+            };
+        }).filter(detail => detail !== null); // Filter out any null values
+
+        return topicDetails;
+    } catch (error) {
+        console.log("Error while fetching topics by placement test ID: ", error);
+
+        // Handle specific error types
+        if (error.code === 'NO_TOPICS_FOUND') {
+            throw new CustomError(error.message, error.code);
+        }
+
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred while fetching topics', 'DATABASE_ERROR');
+        }
+
+        throw new CustomError('Error fetching topics: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
 
 
 module.exports = {
@@ -161,4 +213,5 @@ module.exports = {
     getAllTopics,
     deleteTopic,
     getTopicsBySubjectId,
+    getTopicsByPlacementTestId,
 }

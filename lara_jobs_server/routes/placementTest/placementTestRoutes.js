@@ -8,11 +8,15 @@ placementTestRoutes.post('/test-link/create', placementTestController.createPlac
 
 placementTestRoutes.get('/test-link/:test_id', placementTestController.getPlacementTestByIdController);
 
-placementTestRoutes.get('/test-links/', placementTestController.getPlacementTestByIdController);
+placementTestRoutes.get('/test-links', placementTestController.getAllPlacementTestsController);
 
-placementTestRoutes.put('/test-link', placementTestController.updatePlacementTestController);
+placementTestRoutes.put('/test-link/update/:test_id', placementTestController.updatePlacementTestController);
 
-placementTestRoutes.delete('/test-link/test_id', placementTestController.deletePlacementTestController);
+placementTestRoutes.delete('/test-link/:test_id', placementTestController.deletePlacementTestController);
+
+placementTestRoutes.put('/test-link/link-status', placementTestController.disableLinkController);
+
+placementTestRoutes.put('/test-link/test-monitor-status', placementTestController.updateMonitorStatus);
 
 
 

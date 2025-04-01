@@ -6,5 +6,15 @@ const cumulativeQuestionController = require('../../controllers/placementTest/qu
 
 cumulativeQuestionRoutes.post('/save-question', cumulativeQuestionController.saveCumulatvieQuestion);
 
-cumulativeQuestionRoutes.put('/update-question/:question_id', cumulativeQuestionController.updateCumulativeQuestion);
+cumulativeQuestionRoutes.post('/update-question', cumulativeQuestionController.updateQuestionByIdController);
+
+cumulativeQuestionRoutes.post('/getQuestionCountsByTopicIds', cumulativeQuestionController.getQuestionCountsByTopicIds);
+
+cumulativeQuestionRoutes.post('/saveQuestionAndAddToLink', cumulativeQuestionController.saveQuestionAndAddToLinkController);
+
+cumulativeQuestionRoutes.post('/fetchQuestionsByTestId', cumulativeQuestionController.fetchQuestionsByTestIdController);
+
+cumulativeQuestionRoutes.delete('/delete-question/:question_id', cumulativeQuestionController.deleteQuestion);
+
+module.exports = cumulativeQuestionRoutes;
 

@@ -1,4 +1,6 @@
-const { Topic, PlacementTest, PlacementTestTopic, CumulativeQuestion } = require("../../models");
+const { baseURL } = require("../../config/baseURLConig");
+const CustomError = require("../../errors/CustomErrors");
+const { Topic, PlacementTest, PlacementTestTopic, CumulativeQuestion, sequelize } = require("../../models");
 
 const createPlacementTest = async ({
     number_of_questions,
@@ -70,7 +72,7 @@ const createPlacementTest = async ({
                     test_id: null, // Only fetch questions not yet associated with any test
                 },
                 limit: questionsToFetch,
-                order: db.sequelize.random(),
+                order: sequelize.random(),
             });
 
             for (const question of questions) {
@@ -80,6 +82,7 @@ const createPlacementTest = async ({
 
         return newTest;
     } catch (error) {
+        console.error('error while creating placement test link : ', error)
         throw new CustomError('Error creating placement test: ' + error.message, 'INTERNAL_SERVER_ERROR');
     }
 };
@@ -98,6 +101,7 @@ const updatePlacementTest = async ({
     issue_certificate,
 }) => {
     try {
+        console.log("test id received in services method : ", test_id)
         // Find the placement test by ID
         const test = await PlacementTest.findByPk(test_id);
         if (!test) {
@@ -159,7 +163,7 @@ const updatePlacementTest = async ({
                     test_id: null, // Only fetch questions not yet associated with any test
                 },
                 limit: questionsToFetch,
-                order: db.sequelize.random(),
+                order: sequelize.random(),
             });
 
             for (const question of questions) {
@@ -169,6 +173,7 @@ const updatePlacementTest = async ({
 
         return test; // Return the updated placement test
     } catch (error) {
+        console.log("Error updating test details : ", error)
         throw new CustomError('Error updating placement test: ' + error.message, 'INTERNAL_SERVER_ERROR');
     }
 };
@@ -178,9 +183,14 @@ const updatePlacementTest = async ({
 const getPlacementTestById = async (test_id) => {
     try {
         const test = await PlacementTest.findByPk(test_id, {
-            include: [PlacementTestTopic]  
+            include: [
+                {
+                    model: PlacementTestTopic,
+                    as: 'placementTestTopics'
+                }
+            ]
         });
-        
+
         if (!test) {
             throw new CustomError('Placement test not found', 'PLACEMENT_TEST_NOT_FOUND');
         }
@@ -195,7 +205,12 @@ const getPlacementTestById = async (test_id) => {
 const getAllPlacementTests = async () => {
     try {
         const tests = await PlacementTest.findAll({
-            include: [PlacementTestTopic]  
+            include: [
+                {
+                    model: PlacementTestTopic,
+                    as: 'placementTestTopics'
+                }
+            ]
         });
 
         return tests;
@@ -208,14 +223,14 @@ const getAllPlacementTests = async () => {
 const deletePlacementTest = async (test_id) => {
     try {
         const test = await PlacementTest.findByPk(test_id);
-        
+
         if (!test) {
             throw new CustomError('Placement test not found', 'PLACEMENT_TEST_NOT_FOUND');
         }
 
         // Remove associated topics first
         await PlacementTestTopic.destroy({ where: { placement_test_id: test_id } });
-        
+
         // Remove associated questions
         await CumulativeQuestion.update({ test_id: null }, { where: { test_id: test_id } });
 
@@ -228,12 +243,34 @@ const deletePlacementTest = async (test_id) => {
     }
 };
 
+const updateTestLinkStatus = async (test_id, is_Active) => {
+    try {
+        await PlacementTest.update(
+            { is_Active },
+            { where: { placement_test_id: test_id } }
+        );
+    } catch (error) {
+        throw new CustomError('Error updating link status: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
+const updateIsMonitoredStatus = async (test_id, is_Monitored) => {
+    try {
+        await PlacementTest.update(
+            { is_Monitored },
+            { where: { placement_test_id: test_id } }
+        );
+    } catch (error) {
+        throw new CustomError('Error updating isMonitored status: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
 
 
 module.exports = {
     createPlacementTest,
     updatePlacementTest,
-    getPlacementTestById, 
-    getAllPlacementTests, 
-    deletePlacementTest 
+    getPlacementTestById,
+    getAllPlacementTests,
+    deletePlacementTest,
+    updateTestLinkStatus,
+    updateIsMonitoredStatus,
 };

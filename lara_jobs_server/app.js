@@ -8,6 +8,8 @@ const candidateRoutes = require('./routes/candidateRoutes');
 const authRoutes = require('./routes/authRoutes')
 const subjectRoutes = require('./routes/placementTest/subjectRoutes')
 const topicRoutes = require('./routes/placementTest/topicRoutes')
+const questionRoutes = require('./routes/placementTest/cumulativeQuestionRoutes')
+const placementTestRoutes = require('./routes/placementTest/placementTestRoutes')
 
 
 const PORT = process.env.PORT || 3000;
@@ -21,6 +23,8 @@ app.use('/api', candidateRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/placement-test/subject', subjectRoutes);
 app.use('/api/placement-test/topic', topicRoutes);
+app.use('/api/placement-test/questions', questionRoutes);
+app.use('/api/placement-test/test', placementTestRoutes);
 
 
 initDatabase().then(async ()=>{

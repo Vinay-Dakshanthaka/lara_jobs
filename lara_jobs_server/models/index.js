@@ -53,6 +53,11 @@ CumulativeQuestion.belongsToMany(PlacementTest, {
   as: 'PlacementTests'
 });
 
+CumulativeQuestion.belongsTo(PlacementTest, {
+  foreignKey: 'test_id',
+  as: 'QuestionForPlacementTest'
+});
+
 PlacementTest.belongsToMany(CumulativeQuestion, {
   through: 'CQPlacementTest',
   foreignKey: 'placement_test_id',
@@ -69,14 +74,31 @@ PlacementTestResult.belongsTo(Candidate, {
   as: 'candidates'
 });
 
+PlacementTest.hasMany(PlacementTestTopic, {
+  foreignKey: 'placement_test_id',
+  as: 'placementTestTopics' 
+});
+
 PlacementTestTopic.belongsTo(PlacementTest, {
   foreignKey: 'placement_test_id',
-  as: 'Placementtests'
+  as: 'placementTest' 
 });
+
+
 PlacementTestTopic.belongsTo(Topic, {
   foreignKey: 'topic_id',
   // as: 'topics'
   as: 'Topics'
+});
+
+CumulativeQuestion.hasMany(Option, {
+  foreignKey: 'cumulative_question_id',
+  as: 'QuestionOptions'
+});
+
+CumulativeQuestion.hasMany(CorrectAnswer, {
+  foreignKey: 'cumulative_question_id',
+  as: 'CorrectAnswers' 
 });
 
 module.exports = {

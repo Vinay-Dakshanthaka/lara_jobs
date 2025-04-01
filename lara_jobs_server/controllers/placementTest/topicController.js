@@ -3,8 +3,9 @@ const topicService = require('../../services/placementTest/topicServices')
 
 const createTopic = async (req, res) => {
     try {
-        const { name, subjectId } = req.body;
-        const topic = await topicService.createTopic(name, subjectId);
+        const { topic_name, subjectId } = req.body;
+        console.log("Subject id :", subjectId)
+        const topic = await topicService.createTopic(topic_name, subjectId);
         return res.status(201).json({
             message: 'Topic created successfully',
             data: topic
@@ -17,9 +18,8 @@ const createTopic = async (req, res) => {
 
 const updateTopic = async (req, res) => {
     try {
-        const { topic_id } = req.params;  
-        const { name } = req.body;
-        const topic = await topicService.updateTopic(name, topic_id);
+        const { topic_name,topic_id } = req.body;
+        const topic = await topicService.updateTopic(topic_name, topic_id);
         return res.status(200).json({
             message: 'Topic updated successfully',
             data: topic
@@ -74,7 +74,7 @@ const deleteTopic = async (req, res) => {
 
 const getTopicsBySubjectId = async (req, res) => {
     try {
-       const subject_id = req.params; 
+       const {subject_id} = req.params; 
        const topics = await topicService.getTopicsBySubjectId(subject_id);
        return res.status(200).json({
         message : 'Topics Fetched succssfully ', 
@@ -86,6 +86,27 @@ const getTopicsBySubjectId = async (req, res) => {
     }
 }
 
+const getTopicsByPlacementTestId = async (req, res) => {
+    try {
+        const { placement_test_id } = req.body;
+
+        // Validate the placement_test_id
+        if (!placement_test_id) {
+            return res.status(400).send({ message: "Placement test ID is required." });
+        }
+
+        // Call the service to get topics for the given placement test ID
+        const topics = await topicService.getTopicsByPlacementTestId(placement_test_id);
+
+        return res.status(200).json({
+            message: 'Topics fetched successfully',
+            topics
+        });
+    } catch (error) {
+        console.log("Error while getting topics by Placement Test ID: ", error);
+        handleError(res, error);
+    }
+};
 
 module.exports = {
     createTopic, 
@@ -94,4 +115,5 @@ module.exports = {
     getAllTopics, 
     deleteTopic,
     getTopicsBySubjectId,
+    getTopicsByPlacementTestId,
 }

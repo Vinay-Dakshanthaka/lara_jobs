@@ -44,8 +44,8 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen dark:bg-blue-900 bg-blue-50">
-      <div className="w-full max-w-md p-8 bg-white dark:bg-blue-800 rounded-lg shadow-lg">
+    <div className="flex justify-center items-center min-h-screen dark:bg-dark-900 bg-dark-500">
+      <div className="w-full max-w-md p-8 bg-dark-300 dark:bg-dark-600 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-white">Sign In</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -76,7 +76,7 @@ const SignInForm = () => {
             />
             <div
               onClick={() => setPasswordVisible(!passwordVisible)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer mt-3"
             >
               {passwordVisible ? (
                 <EyeSlashIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />

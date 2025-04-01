@@ -4,7 +4,7 @@ const { Subject, Topic } = require("../../models");
 
 const createSubject = async (name) => {
     try {
-        name = name.trim();
+        console.log("Subject name ", name )
         const existingSubject = await Subject.findOne({ where: { name } });
         if (existingSubject) {
             throw new CustomError('A subject with this name already exists.', 'SUBJECT_ALREADY_EXISTS');
@@ -44,6 +44,8 @@ const getAllSubjects = async () => {
 
 const getSubjectById = async (subjectId) => {
     try {
+        console.log("Subject id ", subjectId)
+        console.log("Inside get subject by ID : =================")
         const subject = await Subject.findByPk(subjectId);
         if (!subject) {
             throw new CustomError('Subject not found', 'SUBJECT_NOT_FOUND');
@@ -64,7 +66,6 @@ const getSubjectById = async (subjectId) => {
 
 const updateSubject = async (subjectId, name) => {
     try {
-        name = name.trim();
         const subject = await Subject.findByPk(subjectId);
         if (!subject) {
             throw new CustomError('Subject not found', 'SUBJECT_NOT_FOUND');
@@ -115,6 +116,7 @@ const deleteSubject = async (subjectId) => {
 
 const getAllSubjectsAndTopics = async () => {
     try {
+        console.log("Req received in services : all topics and subjects ")
         const subjectAndTopics = await Subject.findAll({
             include: [
                 {
@@ -125,7 +127,7 @@ const getAllSubjectsAndTopics = async () => {
         });
         return subjectAndTopics;
     } catch (error) {
-        console.log("Error while deleting subject and topics: ", error);
+        console.log("Error while fetching subject and topics: ", error);
         if (error.name === 'SequelizeDatabaseError') {
             throw new CustomError('Database error occurred while deleting the subject', 'DATABASE_ERROR');
         }
@@ -140,5 +142,5 @@ module.exports = {
     getSubjectById,
     updateSubject,
     deleteSubject,
-    getAllSubjectsAndTopics
+    getAllSubjectsAndTopics,
 }

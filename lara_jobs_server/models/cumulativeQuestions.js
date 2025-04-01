@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/dbConfig');
-const Topic = require('./Topic');
 const PlacementTest = require('./placementTest');
 
 const CumulativeQuestion = sequelize.define('CumulativeQuestion', {
@@ -33,9 +32,23 @@ const CumulativeQuestion = sequelize.define('CumulativeQuestion', {
         allowNull: true,
         defaultValue: 1
     },
+    test_id: {  // ✅ Adding the test_id field
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'PlacementTests',
+            key: 'placement_test_id'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+    }
 }, {
     timestamps: true
 });
 
+CumulativeQuestion.belongsTo(PlacementTest, {
+    foreignKey: 'test_id',
+    as: 'PlacementTest'
+});
 
 module.exports = CumulativeQuestion;

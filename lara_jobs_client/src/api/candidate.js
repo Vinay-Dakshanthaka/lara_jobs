@@ -60,7 +60,15 @@ export const updateCandidateBasicDetails = async (candidateDetails) => {
 
 export const getCandidateDetails = async () => {
     try {
-        const response = await axios.get(`${baseURL}/api/candidate`, config)
+        const jwToken = localStorage.getItem('token');
+        const response = await axios.get(`${baseURL}/api/candidate`, 
+            {
+                headers: {
+                    'Authorization': `Bearer ${jwToken}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
         return response.data;
     } catch (error) {
         console.error("Error while fetching candidate data : ", error);

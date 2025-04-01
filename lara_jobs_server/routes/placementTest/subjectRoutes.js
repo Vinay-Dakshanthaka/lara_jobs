@@ -1,6 +1,7 @@
 const express = require('express');
 const subjectRoutes = express.Router();
 const subjectController = require('../../controllers/placementTest/subjectController');
+const verifyJwt = require('../../middlewares/jwtMiddleware');
 
 //save new Subject
 subjectRoutes.post('/create', subjectController.createSubject);
@@ -9,15 +10,15 @@ subjectRoutes.post('/create', subjectController.createSubject);
 subjectRoutes.get('/get-all-subjects', subjectController.getAllSubjects);
 
 //fethc subject by Id
-subjectRoutes.get('/:subject_id', subjectController.getSubjectById);
+subjectRoutes.get('/getSubjectById/:subject_id', subjectController.getSubjectById);
 
 //update subject 
-subjectRoutes.put('/:subject_id', subjectController.getSubjectById);
+subjectRoutes.put('/:subject_id', subjectController.updateSubject);
 
 //delete a subject 
 subjectRoutes.delete('/:subject_id', subjectController.deleteSubject);
 
-subjectRoutes.get('/get-all-subjects-topics', subjectController.getAllSubjectsAndTopics);
+subjectRoutes.get('/subject-topics', subjectController.getAllSubjectsAndTopicsController);
 
 
 module.exports = subjectRoutes;

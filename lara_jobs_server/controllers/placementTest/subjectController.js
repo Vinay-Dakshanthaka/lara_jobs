@@ -4,6 +4,7 @@ const subjectService = require('../../services/placementTest/subjectSevices')
 const createSubject = async (req, res) => {
     try {
         const { name } = req.body;
+        console.log("Subject name received : ", name)
         const subject = await subjectService.createSubject(name);
         return res.status(201).json({
             message: 'Subject created successfully',
@@ -32,7 +33,8 @@ const getAllSubjects = async (req, res) => {
 
 const getSubjectById = async (req, res) => {
     try {
-        const subject_id = req.params;
+        const {subject_id} = req.params;
+        console.log(" subject Id " , subject_id)
         const subject = await subjectService.getSubjectById(subject_id);
         return res.status(200).json({
             message : 'Subject Found ', 
@@ -46,7 +48,7 @@ const getSubjectById = async (req, res) => {
 
 const updateSubject = async (req, res) => {
     try {
-        const subject_id = req.params;
+        const {subject_id} = req.params;
         const { subject_name } = req.body;
         const subject = await subjectService.updateSubject(subject_id, subject_name);
         return res.status(200).json({
@@ -61,7 +63,7 @@ const updateSubject = async (req, res) => {
 
 const deleteSubject = async (req, res) => {
     try{
-        const subject_id = req.params;
+        const {subject_id} = req.params;
         await subjectService.deleteSubject(subject_id);
         return res.status(200).json({
             message : 'Subject Deleted Successfully',
@@ -73,8 +75,9 @@ const deleteSubject = async (req, res) => {
     }
 }
 
-const getAllSubjectsAndTopics = async (req, res) => {
+const getAllSubjectsAndTopicsController = async (req, res) => {
     try {
+        console.log("Request Received in controller : ==============")
         const subjectAndTopics = await subjectService.getAllSubjectsAndTopics();
         res.status(200).json({
             message : 'Fetched All Subjeccts and their topics Successfully', 
@@ -92,5 +95,5 @@ module.exports = {
     getSubjectById, 
     updateSubject,
     deleteSubject,
-    getAllSubjectsAndTopics,
+    getAllSubjectsAndTopicsController,
 };

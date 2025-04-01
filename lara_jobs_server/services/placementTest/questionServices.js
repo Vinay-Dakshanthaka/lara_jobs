@@ -1,5 +1,5 @@
 const CustomError = require("../../errors/CustomErrors");
-const { CumulativeQuestion, Topic, CQPlacementTest, PlacementTest } = require("../../models");
+const { CumulativeQuestion, Topic, CQPlacementTest, PlacementTest, Option, CorrectAnswer } = require("../../models");
 
 const createCumulativeQuestion = async (questionData) => {
     try {
@@ -30,9 +30,10 @@ const createCumulativeQuestion = async (questionData) => {
 const updateCumulativeQuestion = async (questoin_id, questionData) => {
     try {
 
+            console.log("Question id ::::", questoin_id)
         const question = await CumulativeQuestion.findByPk(questoin_id);
         if (!question) {
-            throw new CustomError('Question Not Found ', 'NOT_FOUND');
+            throw new CustomError('Question Not Found ', 'QUESTION_NOT_FOUND');
         }
 
         const cumulativeQuestion = CumulativeQuestion.update(questionData);
@@ -45,7 +46,7 @@ const updateCumulativeQuestion = async (questoin_id, questionData) => {
             throw new CustomError('Database error occurred', 'DATABASE_ERROR');
         }
 
-        if (error.code === 'NOT_FOUND') {
+        if (error.code === 'QUESTION_NOT_FOUND') {
             throw new CustomError(error.message, error.code);
         }
 
@@ -155,7 +156,7 @@ const saveQuestionAndAddToLinkService = async (data) => {
             option_description: optionDescription.trim()
         }));
 
-        await OptionsTable.bulkCreate(optionList);
+        await Option.bulkCreate(optionList);
 
         // Create the correct answers
         const correctOptionList = correct_options.map((correctOption) => ({
@@ -274,9 +275,182 @@ const uploadAndAssignQuestionsToLinkService = async (filePath, topic_id, placeme
         };
     } catch (error) {
         console.error('Error in the upload process:', error);
-        throw new Error('Error in uploading and assigning questions');
+        // throw new Error('Error in uploading and assigning questions');
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        if (error.code === 'NOT_FOUND' || error.code === 'INVALID_INPUT') {
+            throw new CustomError(error.message, error.code);
+        }
+
+        throw new CustomError('Error creating subject: ' + error.message, 'INTERNAL_SERVER_ERROR');
     }
 };
+
+
+const getQuestionCountsByTopicIds = async (topic_ids) => {
+    try {
+        if (!topic_ids || topic_ids.length === 0) {
+            throw new CustomError("Invalid input data", "INVALID_INPUT");
+        }
+
+        // Array to store question counts
+        let questionCounts = [];
+
+        for (let topicId of topic_ids) {
+            const count = await CumulativeQuestion.count({
+                where: { topic_id: topicId }
+            });
+
+            questionCounts.push({
+                topic_id: topicId,
+                question_count: count
+            });
+        }
+
+        return questionCounts;
+
+    } catch (error) {
+        console.error("Error in getQuestionCountsByTopicIds:", error);
+
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        throw new CustomError(error.message || 'Internal Server Error', 'INTERNAL_SERVER_ERROR');
+    }
+};
+
+const fetchQuestionsByTestIdService = async (placement_test_id) => {
+    try {
+        // Fetch the number of questions from the PlacementTest table
+        const placementTest = await PlacementTest.findByPk(placement_test_id, {
+            attributes: ['number_of_questions']
+        });
+
+        if (!placementTest) {
+            throw new CustomError('Placement test not found', 'NOT_FOUND');
+        }
+
+        const numberOfQuestions = placementTest.number_of_questions;
+
+        // Fetch cumulative_question_ids from CumulativeQuestionPlacementTest table
+        const questionPlacements = await CQPlacementTest.findAll({
+            where: { placement_test_id },
+            attributes: ['cumulative_question_id']
+        });
+
+        if (!questionPlacements.length) {
+            throw new CustomError('No questions found for this test', 'NO_QUESTIONS_FOUND');
+        }
+
+        const questionIds = questionPlacements.map(q => q.cumulative_question_id);
+
+        // Shuffle the question IDs and limit to the number of questions specified in the placement test
+        const shuffledQuestionIds = questionIds.sort(() => 0.5 - Math.random());
+        const limitedQuestionIds = shuffledQuestionIds.slice(0, Math.min(numberOfQuestions, questionIds.length));
+
+        // Fetch questions based on the shuffled and limited question IDs
+        const questions = await CumulativeQuestion.findAll({
+            where: { cumulative_question_id: limitedQuestionIds },
+            include: [
+                {
+                    model: Option,
+                    as: 'QuestionOptions',
+                    attributes: ['option_id', 'option_description']
+                },
+                {
+                    model: CorrectAnswer,
+                    as: 'CorrectAnswers',
+                    attributes: ['correct_answer_id', 'answer_description']
+                }
+            ]
+        });
+
+        return questions;
+    } catch (error) {
+        
+        console.error('Error in fetchQuestionsByTestIdService:', error);
+
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        if (error.code === 'NOT_FOUND' || error.code === 'NO_QUESTIONS_FOUND') {
+            throw new CustomError(error.message, error.code);
+        }
+
+        throw new CustomError('Error creating subject: ' + error.message, 'INTERNAL_SERVER_ERROR');
+
+    }
+};
+
+
+const updateQuestionService = async (cumulative_question_id, question_description, options, correct_answers) => {
+    try {
+        // Find the question by ID
+        const question = await CumulativeQuestion.findByPk(cumulative_question_id);
+
+        if (!question) {
+            throw new CustomError('Question not found', 'QUESTION_NOT_FOUND');
+        }
+
+        // Update the question description
+        question.question_description = question_description || question.question_description;
+        await question.save();
+
+        // Update options
+        if (options && options.length) {
+            // Delete existing options
+            await Option.destroy({
+                where: { cumulative_question_id }
+            });
+
+            // Add new options
+            for (let option of options) {
+                await Option.create({
+                    cumulative_question_id,
+                    option_description: option.option_description
+                });
+            }
+        }
+
+        // Filter valid correct answers
+        const validCorrectAnswers = correct_answers.filter(answer =>
+            options.some(option => option.option_description === answer)
+        );
+
+        // Update correct answers
+        if (validCorrectAnswers && validCorrectAnswers.length) {
+            // Delete existing correct answers
+            await CorrectAnswer.destroy({
+                where: { cumulative_question_id }
+            });
+
+            // Add new valid correct answers
+            for (let answer of validCorrectAnswers) {
+                await CorrectAnswer.create({
+                    cumulative_question_id,
+                    answer_description: answer
+                });
+            }
+        }
+
+        return { message: "Question updated successfully" };
+    } catch (error) {
+        console.error("Error while updating question:", error);
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+        if (error.code === 'QUESTION_NOT_FOUND') {
+            throw new CustomError(error.message, error.code);
+        }
+        throw new CustomError('Error updating question: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
+
+
 
 
 
@@ -286,5 +460,8 @@ module.exports = {
     deleteQuestion,
     assignQuestionsToPlacementTestService,
     saveQuestionAndAddToLinkService,
-    uploadAndAssignQuestionsToLinkService
+    uploadAndAssignQuestionsToLinkService,
+    getQuestionCountsByTopicIds,
+    fetchQuestionsByTestIdService,
+    updateQuestionService,
 }

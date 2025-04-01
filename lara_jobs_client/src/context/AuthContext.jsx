@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   // Simulating an API call to fetch user authentication state
   useEffect(() => {
     // Read the role and token from localStorage
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
 
     if (token && role) {
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     // Store token and role separately in localStorage
-    localStorage.setItem('auth_token', userData.token);
+    localStorage.setItem('token', userData.token);
     localStorage.setItem('role', userData.role);
     
     // Update user state
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     // Remove token and role from localStorage
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('token');
     localStorage.removeItem('role');
     
     // Clear user state
