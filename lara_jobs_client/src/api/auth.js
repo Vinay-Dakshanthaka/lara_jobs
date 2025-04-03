@@ -73,7 +73,7 @@ export const sendResetPasswordEmail = async (email) => {
 
 export const signInUser = async (email, password) => {
   try {
-    console.log(`Received email ${email} : password : ${password}`)
+    // console.log(`Received email ${email} : password : ${password}`)
     const response = await axios.post(`${baseURL}/api/auth/login`, {
       email: email, 
       password: password

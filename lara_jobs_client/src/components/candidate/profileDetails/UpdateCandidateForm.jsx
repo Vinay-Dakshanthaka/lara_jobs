@@ -183,10 +183,10 @@ const UpdateCandidateForm = () => {
         const token = localStorage.getItem('token');
         const email = localStorage.getItem('email');
 
-        if (!token) {
-            setErrorMessage('Authorization token is missing.');
-            return;
-        }
+        // if (!token) {
+        //     setErrorMessage('Authorization token is missing.');
+        //     return;
+        // }
 
         if (!email) {
             setErrorMessage('Email is missing.');

@@ -287,9 +287,9 @@ const AddQuestions = () => {
                             <span
                                 variant="secondary"
                                 onClick={addOptionField}
-                                className="mb-3 col-6 px-4 py-2 inline-block cursor-pointer bg-gray-200 rounded-md text-gray-600 hover:bg-gray-300"
+                                className="mb-3 col-6 text-center  px-4 py-2 inline-block cursor-pointer bg-gray-200 rounded-md text-gray-600 hover:bg-gray-300"
                             >
-                                <PlusIcon className="w-5 h-5 mr-2" />
+                                <PlusIcon className="w-5 h-5 mr-2 font-bold " />
                                 Add one more option
                             </span>
                         </div>

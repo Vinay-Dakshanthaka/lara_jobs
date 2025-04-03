@@ -121,10 +121,10 @@ const UploadQuestionsToLink = () => {
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await axios.post(`${baseURL}/api/placement-test/upload-questions-link`, formData, {
+            const response = await axios.post(`${baseURL}/api/placement-test/questions/upload-questions-link`, formData, {
                 params: {
                     topic_id: selectedTopic,
-                    test_id: test_id
+                    placement_test_id: test_id
                 },
                 ...config,
             });
@@ -164,7 +164,7 @@ const UploadQuestionsToLink = () => {
                             </a>
                         </h5>
                     </div>
-                    <Link to={`/add-new-questions/${placementTestDetails.test_id}`} className="w-full md:w-1/2">
+                    <Link to={`/admin/test/add-new-question/${placementTestDetails.placement_test_id}`} className="w-full md:w-1/2">
                         <span className="bg-transparent border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-4 py-2 rounded-md">
                             Add New Questions for this test link
                         </span>

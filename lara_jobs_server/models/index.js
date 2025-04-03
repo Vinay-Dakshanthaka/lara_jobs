@@ -12,6 +12,7 @@ const Option = require('./options')
 const CorrectAnswer = require('./correctAnswer')
 const PlacementTestResult = require('./placementTestResult')
 const PlacementTestTopic = require('./placementTestTopic')
+const Company = require('./companies')
 
 const initDatabase = async () => {
   try {
@@ -108,5 +109,5 @@ module.exports = {
   OTPVerification,
   Subject,
   Topic,
-  CumulativeQuestion, PlacementTest, CQPlacementTest, Option, CorrectAnswer, PlacementTestResult, PlacementTestTopic
+  CumulativeQuestion, PlacementTest, CQPlacementTest, Option, CorrectAnswer, PlacementTestResult, PlacementTestTopic, Company
 }

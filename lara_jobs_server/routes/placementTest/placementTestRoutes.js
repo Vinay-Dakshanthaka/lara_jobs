@@ -2,6 +2,7 @@ const express = require('express')
 const placementTestRoutes = express.Router();
 
 const placementTestController = require('../../controllers/placementTest/placementTestController');
+const verifyJwt = require('../../middlewares/jwtMiddleware');
 
 
 placementTestRoutes.post('/test-link/create', placementTestController.createPlacementTestController);
@@ -17,6 +18,21 @@ placementTestRoutes.delete('/test-link/:test_id', placementTestController.delete
 placementTestRoutes.put('/test-link/link-status', placementTestController.disableLinkController);
 
 placementTestRoutes.put('/test-link/test-monitor-status', placementTestController.updateMonitorStatus);
+
+placementTestRoutes.post('/test-link/assign-selected-questions', placementTestController.assignQuestionsToPlacementTestController);
+
+placementTestRoutes.post('/test-link/fetchTestTopicIdsAndQnNums', placementTestController.fetchTestTopicIdsAndQnNumsController);
+
+
+// TEST RESULTS ROUTES 
+
+placementTestRoutes.post('/test-results/save', verifyJwt, placementTestController.savePlacementTestResultsController);
+
+placementTestRoutes.post('/test-results/isCandidateAttended', verifyJwt, placementTestController.checkIfCandidateAttendedTestController);
+
+placementTestRoutes.post('/test-results/getAllResultsByTestId',  placementTestController.getAllResultsByTestIdController);
+
+placementTestRoutes.get('/test-results/getResultsByCandidateId', verifyJwt,  placementTestController.getPlacementTestResultsByCandidateIdController);
 
 
 

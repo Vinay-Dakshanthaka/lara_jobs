@@ -1,6 +1,7 @@
 const errorCodes = {
     'EMAIL_ALREADY_EXISTS': { status: 409, message: 'A candidate with this email already exists.' },
     'DUPLICATE_PHONE_NUMBER': { status: 409, message: 'Phone nubmber is alredy registered' },
+    'DUPLICATE_RESULT': { status: 409, message: 'You have already attended the test' },
     'EMAIL_SENDING_FAILED': { status: 500, message: 'We were unable to send an OTP email. Please try again later.' },
     'DATABASE_ERROR': { status: 500, message: 'Database error occurred.' },
     'NOT_FOUND': { status: 404, message: 'Candidate not found.' },
@@ -19,6 +20,8 @@ const errorCodes = {
     'INVALID_INPUT': { status: 401, message: 'Invalid input' },
     'NO_TOPICS_FOUND': { status: 404, message: 'No active topics found' },
     'NO_QUESTIONS_FOUND': { status: 404, message: 'No Questions assigned for this test link.' },
+    'BAD_REQUEST': { status: 404, message: 'One or More fields are missing.' },
+    'FORBIDDEN': {status : 404, message : 'Access Forbidden'},
 };
 
 const handleError = (res, error) => {

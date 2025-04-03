@@ -1,3 +1,4 @@
+const xlsx = require('xlsx');
 const handleError = require("../../errors/errorHandler");
 const questionService = require("../../services/placementTest/questionServices")
 
@@ -82,27 +83,24 @@ const saveQuestionAndAddToLinkController = async (req, res) => {
     }
 };
 
-const uploadAndAssignQuestionsToLinkController = async (req, res) => {
+const uploadAndAssignQuestionsToLinkController = async (filePath, topic_id, placement_test_id) => {
     try {
-        const { filePath, topic_id, placement_test_id } = req.body;
-
         if (!filePath || !topic_id) {
-            return res.status(400).send({
-                message: 'File path and topic ID are required.'
-            });
+            throw new Error('File path and topic ID are required.');
         }
+        console.log("test id received in controller : ", placement_test_id)
 
         const result = await questionService.uploadAndAssignQuestionsToLinkService(filePath, topic_id, placement_test_id);
 
         // Respond with the result summary and skipped questions (if any)
-        return res.status(200).json({
+        return {
             message: result.message,
             summary: result.summary,
             skippedQuestions: result.skippedQuestions
-        });
+        };
     } catch (error) {
         console.error("Error while uploading and assigning questions:", error);
-        handleError(res, error);
+        handleError(res, error)
     }
 };
 
@@ -226,6 +224,29 @@ const updateQuestionByIdController = async (req, res) => {
     }
 };
 
+const getQuestionsByTopicIdController = async (req, res) => {
+    try {
+        const { topic_id } = req.body;  
+
+        if (!topic_id) {
+            return res.status(400).send({ message: 'Topic ID is required' });
+        }
+
+        const questions = await questionService.fetchQuestionsByTopicIdService(topic_id);
+
+        if (questions.length > 0) {
+            return res.status(200).json({
+                message: 'Questions retrieved successfully',
+                questions,
+            });
+        } else {
+            return res.status(404).send({ message: 'No questions found for this topic' });
+        }
+    } catch (error) {
+        console.log('Error in fetchQuestionsByTopicIdController:', error);
+        handleError(res, error);  // Assuming you have a global error handler
+    }
+};
 
 
 module.exports = {
@@ -239,4 +260,5 @@ module.exports = {
     fetchQuestionsByTestIdController,
     // updateQuestionById,
     updateQuestionByIdController,
+    getQuestionsByTopicIdController
 }

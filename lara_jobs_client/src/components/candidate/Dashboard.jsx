@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Profile from "./Profile";
 import Sidebar from "../../sidebar/Sidebar";
 import AdminSidebar from "../../sidebar/AdminSidebar";
+import BackButton from "../../sidebar/BackButton";
 
 const Dashboard = () => {
   const [userRole, setUserRole] = useState("");
@@ -21,6 +21,7 @@ const Dashboard = () => {
 
       {/* Main content area where components will be rendered */}
       <div className="flex-1 bg-gray-200 dark:bg-gray-700 p-4 text-gray-800 dark:text-white overflow-x-auto">
+        <BackButton />
         <Outlet /> {/* This is where nested routes will render */}
       </div>
     </div>

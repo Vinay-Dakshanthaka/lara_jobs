@@ -8,7 +8,9 @@ const EmailInput = ({ handleSubmitEmail, loading, errorMessage }) => {
     email: Yup.string().email("Invalid email format").required("Email is required"),
   });
 
-
+  const handleSignInRedirect = () => {
+    navigate('/signin'); // Navigate to sign-in page when clicked
+  };
 
   return (
     <Formik
@@ -40,7 +42,9 @@ const EmailInput = ({ handleSubmitEmail, loading, errorMessage }) => {
             {loading ? "Sending OTP..." : "Verify"}
           </button>
           <p className="text-center my-3">
-            <button className="text-white">Have an account? <span onClick={navigate('/signin')} className="underline text-blue-500">Sign In</span></button>
+            <button type="button" onClick={handleSignInRedirect} className="text-white">
+              Have an account? <span className="underline text-blue-500">Sign In</span>
+            </button>
           </p>
         </Form>
       )}

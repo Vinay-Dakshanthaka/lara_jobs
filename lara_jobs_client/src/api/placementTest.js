@@ -52,3 +52,30 @@ export const updateMonitoredStatus = async (test_id, is_Monitored) => {
         throw error;
     }
 };
+
+
+// Candidate test reuslts 
+
+export const hasCandidateAttended = async (test_id) => {
+    try {
+
+        const token = localStorage.getItem('token');
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        }
+
+        const hasAttended = await axios.post(`${baseURL}/api/placement-test/test/test-results/isCandidateAttended`, {
+           placement_test_id : test_id,
+        },config);
+
+        // console.log('HasAttended ', hasAttended)
+
+        return hasAttended.data.hasAttended;
+    } catch (error) {
+        console.error('Error updating monitored status:', error);
+        throw error;
+    }
+};

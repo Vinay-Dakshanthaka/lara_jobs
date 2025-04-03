@@ -176,6 +176,121 @@ const updateMonitorStatus = async (req, res) => {
     }
 };
 
+const assignQuestionsToPlacementTestController = async (req, res) => {
+    const { placement_test_id, question_ids } = req.body;
+
+    try {
+        // Validate if placement_test_id and question_ids are provided
+        if (!placement_test_id || !question_ids || question_ids.length === 0) {
+            return res.status(400).send({ message: 'Placement test ID and question IDs are required.' });
+        }
+
+        // Call the service method to assign questions
+        const result = await placementTestService.assignQuestionsToPlacementTestService(placement_test_id, question_ids);
+
+        if (result.success) {
+            return res.status(200).send({
+                message: 'Questions assigned to placement test successfully.',
+                assignments: result.assignments
+            });
+        } else {
+            return res.status(200).send({ message: 'The selected questions already exist in the placement test.' });
+        }
+    } catch (error) {
+        console.log('Error in assignQuestionsToPlacementTestController:', error);
+        return res.status(500).send({ message: error.message });
+    }
+};
+
+
+const fetchTestTopicIdsAndQnNumsController = async (req, res) => {
+    try {
+        const { encrypted_test_id } = req.body;
+
+        // Call the service method to get the test details
+        const result = await placementTestService.fetchTestTopicIdsAndQnNumsService(encrypted_test_id);
+
+        // Respond with the fetched details
+        return res.status(200).send({
+            message: 'Placement test details retrieved successfully',
+            ...result
+        });
+    } catch (error) {
+        console.log('Error in fetchTestTopicIdsAndQnNumsController:', error);
+        handleError(res, error); 
+    }
+};
+
+const savePlacementTestResultsController = async (req, res) => {
+    try {
+        const candidate = req.candidate;
+        const candidate_id = candidate.id;
+        const { placement_test_id, marks_obtained, total_marks } = req.body;
+        console.log('Candidate id received in controller ', candidate_id)
+
+        // Call the service method to save test results
+        const testResults = await placementTestService.savePlacementTestResultsService(
+            placement_test_id,
+            candidate_id,
+            marks_obtained,
+            total_marks
+        );
+
+        return res.status(200).send(testResults);
+    } catch (error) {
+        // Handle errors
+        console.log('Error in saving placement test results:', error);
+        handleError(res, error); 
+    }
+};
+
+const checkIfCandidateAttendedTestController = async (req, res) => {
+    try {
+        const candidate = req.candidate;
+        const candidate_id = candidate.id;
+        const { placement_test_id } = req.body;
+
+        const hasAttended = await placementTestService.checkIfCandidateAttendedTestService(placement_test_id, candidate_id);
+
+        return res.status(200).json({
+            hasAttended
+        });
+
+    } catch (error) {
+        console.error("Error checking candidate attendance:", error);
+        handleError(res, error); 
+    }
+};
+
+const getAllResultsByTestIdController = async (req, res) => {
+    try {
+        const { placement_test_id } = req.body;
+
+        const result = await placementTestService.getAllResultsByTestIdService(placement_test_id);
+
+        return res.status(200).send(result);
+
+    } catch (error) {
+        console.log('Error in fetching placement test results:', error);
+
+       handleError(res, error);
+    }
+};
+
+const getPlacementTestResultsByCandidateIdController = async (req, res) => {
+    try {
+        const candidate_id = req.candidate.id
+
+        const result = await placementTestService.getPlacementTestResultsByCandidateIdService(candidate_id);
+
+        return res.status(200).send(result);
+    } catch (error) {
+        console.error('Error in fetching placement test results by email:', error);
+        handleError(res, error);  
+    }
+};
+
+
 module.exports = {
     createPlacementTestController,
     updatePlacementTestController,
@@ -184,4 +299,10 @@ module.exports = {
     deletePlacementTestController,
     disableLinkController,
     updateMonitorStatus,
+    assignQuestionsToPlacementTestController,
+    fetchTestTopicIdsAndQnNumsController,
+    savePlacementTestResultsController,
+    checkIfCandidateAttendedTestController,
+    getAllResultsByTestIdController,
+    getPlacementTestResultsByCandidateIdController,
 };

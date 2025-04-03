@@ -39,10 +39,7 @@ export const updatePassword = async (password) => {
 
 export const updateCandidateBasicDetails = async (candidateDetails) => {
     try {
-        // If the token is not present, throw an error
-        if (!token) {
-            throw new Error('Authorization token is missing.');
-        }
+        
 
         const response = await axios.put(
             `${baseURL}/api/candidate/update-by-email`,

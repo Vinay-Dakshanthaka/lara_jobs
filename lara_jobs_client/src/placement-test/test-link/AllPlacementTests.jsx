@@ -277,7 +277,7 @@ const AllPlacementTests = () => {
                                 </td>
                                 <td className="px-2 py-2 border-b">
                                     <Link
-                                        to={`/get-result/${test.placement_test_id}`}
+                                        to={`/admin/test/get-result/${test.placement_test_id}`}
                                         className="text-white"
                                     >
                                         Results
@@ -285,7 +285,7 @@ const AllPlacementTests = () => {
                                 </td>
                                 <td className="px-2 py-2 border-b">
                                     <Link
-                                        to={`/add-questions-tolink/${test.placement_test_id}`}
+                                        to={`/admin/test/add-existing-questions/${test.placement_test_id}`}
                                         className="text-white"
                                     >
                                         Add Existing Questions

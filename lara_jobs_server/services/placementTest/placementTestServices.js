@@ -1,6 +1,6 @@
 const { baseURL } = require("../../config/baseURLConig");
 const CustomError = require("../../errors/CustomErrors");
-const { Topic, PlacementTest, PlacementTestTopic, CumulativeQuestion, sequelize } = require("../../models");
+const { Topic, PlacementTest, PlacementTestTopic, CumulativeQuestion, sequelize, CQPlacementTest, PlacementTestResult, Candidate } = require("../../models");
 
 const createPlacementTest = async ({
     number_of_questions,
@@ -264,6 +264,285 @@ const updateIsMonitoredStatus = async (test_id, is_Monitored) => {
     }
 };
 
+const assignQuestionsToPlacementTestService = async (placement_test_id, question_ids) => {
+    try {
+        // Check if placement_test_id exists in PlacementTest table
+        const test = await PlacementTest.findByPk(placement_test_id);
+        if (!test) {
+            throw new Error(`Placement test with ID ${placement_test_id} not found.`);
+        }
+
+        // Check which question_ids are already assigned to the placement test
+        const existingAssignments = await CQPlacementTest.findAll({
+            where: { placement_test_id: placement_test_id },
+            attributes: ['cumulative_question_id']
+        });
+
+        const assignedQuestionIds = existingAssignments.map(a => a.cumulative_question_id);
+
+        // Filter out already assigned question_ids
+        const newQuestionIds = question_ids.filter(id => !assignedQuestionIds.includes(id));
+
+        if (newQuestionIds.length === 0) {
+            return { success: false, assignments: [] };  // No new questions to assign
+        }
+
+        // Create an array of objects to bulk create entries in CumulativeQuestionPlacementTest
+        const assignments = newQuestionIds.map(question_id => ({
+            cumulative_question_id: question_id,
+            placement_test_id: placement_test_id
+        }));
+
+        // Bulk create entries in the CumulativeQuestionPlacementTest table
+        const createdAssignments = await CQPlacementTest.bulkCreate(assignments);
+
+        return { success: true, assignments: createdAssignments };
+    } catch (error) {
+        console.error('Error in assignQuestionsToPlacementTestService:', error);
+        throw new Error('An error occurred while assigning questions to the placement test.');
+    }
+};
+
+const fetchTestTopicIdsAndQnNumsService = async (encrypted_test_id) => {
+    try {
+        // Validate if encrypted_test_id is provided
+        if (!encrypted_test_id) {
+            throw new CustomError('Encrypted Test ID is required.', 'INVALID_INPUT');
+        }
+
+        // Fetch active test
+        const activeTest = await PlacementTest.findByPk(encrypted_test_id);
+        if (!activeTest) {
+            throw new CustomError('Test Not Found', 'NOT_FOUND');
+        }
+
+        // Check if test is active
+        if (!activeTest.is_Active) {
+            throw new CustomError('Access Forbidden', 'FORBIDDEN');
+        }
+
+        // Fetch associated topic IDs
+        const placementTestTopics = await PlacementTestTopic.findAll({
+            where: {
+                placement_test_id: encrypted_test_id
+            },
+            attributes: ['topic_id']
+        });
+
+        // Fetch placement test details (e.g., number_of_questions, show_result, etc.)
+        const placementTest = await PlacementTest.findByPk(encrypted_test_id, {
+            attributes: ['number_of_questions', 'show_result', 'is_Monitored', 'test_title', 'certificate_name', 'issue_certificate']
+        });
+
+        if (!placementTest) {
+            throw new CustomError('Placement test not found', 'NOT_FOUND');
+        }
+
+        const topic_ids = placementTestTopics.map(topic => topic.topic_id);
+
+        return {
+            topic_ids,
+            number_of_questions: placementTest.number_of_questions,
+            show_result: placementTest.show_result,
+            is_Monitored: placementTest.is_Monitored,
+            test_title: placementTest.test_title,
+            certificate_name: placementTest.certificate_name,
+            issue_certificate: placementTest.issue_certificate
+        };
+    } catch (error) {
+
+
+        console.error('Error fetching test details in service:', error.stack);
+
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        if (error.code === 'NOT_FOUND' || error.code === 'FORBIDDEN') {
+            throw new CustomError(error.message, error.code);
+        }
+
+        throw new CustomError('Error creating subject: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
+
+const savePlacementTestResultsService = async (placement_test_id, candidate_id, marks_obtained, total_marks) => {
+    try {
+        // Check if there is already a result for this combination
+        const existingResult = await PlacementTestResult.findOne({
+            where: {
+                placement_test_id,
+                candidate_id,
+            },
+        });
+
+        if (existingResult) {
+            throw new CustomError("You have already attended this test.", "DUPLICATE_RESULT");
+        }
+
+        // Check if the student exists
+        const placementStudent = await Candidate.findByPk(candidate_id);
+        if (!placementStudent) {
+            throw new CustomError("Candidat Not Found", "NOT_FOUND");
+        }
+
+        // Save the test results
+        const testResults = await PlacementTestResult.create({
+            placement_test_id,
+            candidate_id,
+            marks_obtained,
+            total_marks
+        });
+
+        return testResults;
+    } catch (error) {
+        console.error("Error saving placement test results:", error.stack);
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        if (error.code === 'NOT_FOUND', error.code === 'DUPLICATE_RESULT') {
+            throw new CustomError(error.message, error.code);
+        }
+
+        throw new CustomError('Error fetching candidate: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
+
+const checkIfCandidateAttendedTestService = async (placement_test_id, candidate_id) => {
+    try {
+        const existingResult = await PlacementTestResult.findOne({
+            where: {
+                placement_test_id,
+                candidate_id,
+            },
+        });
+
+        if (existingResult) {
+            return true;
+        }
+
+        return false;
+
+    } catch (error) {
+        console.error("Error checking if candidate attended the test:", error.stack);
+
+        // Handle database error
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        // Catch any other errors
+        throw new CustomError('Error checking candidate attendance: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
+
+const getAllResultsByTestIdService = async (placement_test_id) => {
+    try {
+        if (!placement_test_id) {
+            throw new CustomError('placement_test_id is required', 'BAD_REQUEST');
+        }
+
+        const results = await PlacementTestResult.findAll({
+            where: { placement_test_id },
+            attributes: ['candidate_id', 'marks_obtained', 'total_marks']
+        });
+
+        const studentIds = results.map(result => result.candidate_id);
+        if (studentIds.length === 0) {
+            throw new CustomError('No results found for the provided placement_test_id', 'NOT_FOUND');
+        }
+
+        const candidates = await Candidate.findAll({
+            where: { id: studentIds },
+            attributes: ['id', 'name', 'email', 'phone_number','town', 'district', 'state']
+        });
+
+        const assignedTopics = await PlacementTestTopic.findAll({
+            where: { placement_test_id },
+            attributes: ['topic_id']
+        });
+
+        const topicIds = assignedTopics.map(topic => topic.topic_id);
+
+        const topics = await Topic.findAll({
+            where: { topic_id: topicIds },
+            attributes: ['topic_id', 'name']
+        });
+
+        const topicNames = topics.map(topic => topic.name);
+
+        const combinedResults = results.map(result => {
+            const student = candidates.find(student => student.id === result.candidate_id);
+            return {
+                candidate_id: result.candidate_id,
+                marks_obtained: result.marks_obtained,
+                total_marks: result.total_marks,
+                student_details: student ? {
+                    student_name: student.name,
+                    email: student.email,
+                    phone_number: student.phone_number,
+                    district: student.district,
+                    state: student.state,
+                } : null
+            };
+        });
+
+        return { candidates: combinedResults, topics: topicNames };
+
+    } catch (error) {
+        console.error("Erroro fetching all results : ", error)
+        throw new CustomError('Error fetching results', 'INTERNAL_SERVER_ERROR');
+    }
+};
+
+const getPlacementTestResultsByCandidateIdService = async (candidate_id) => {
+    try {
+        if (!candidate_id) {
+            throw new CustomError('Email is required', 'BAD_REQUEST');
+        }
+
+        // Find the student by email
+        const placementStudent = await Candidate.findOne({
+            where: { id : candidate_id },
+            attributes: ['id', 'name', 'email', 'phone_number', 'district', 'state'],
+        });
+
+        if (!placementStudent) {
+            throw new CustomError('NO Candidate found', 'NOT_FOUND');
+        }
+
+        const { id } = placementStudent;
+
+        // Fetch all test results for the student
+        const testResults = await PlacementTestResult.findAll({
+            where: { candidate_id : id },
+            attributes: ['placement_test_id', 'marks_obtained', 'total_marks', 'createdAt'],
+            include: [
+                {
+                    model: PlacementTest,
+                    as: 'Placementtests',
+                    attributes: ['test_title', 'start_time', 'certificate_name'],
+                },
+            ],
+            order: [['createdAt', 'DESC']],
+        });
+
+        if (testResults.length === 0) {
+            throw new CustomError('No test results found for this student.', 'NOT_FOUND');
+        }
+
+        return {
+            student: placementStudent,
+            testResults,
+        };
+    } catch (error) {
+        console.error('Error in fetching placement test results:', error);
+        throw new CustomError(error.message, error.code || 'INTERNAL_SERVER_ERROR');
+    }
+};
+
+
 
 module.exports = {
     createPlacementTest,
@@ -273,4 +552,10 @@ module.exports = {
     deletePlacementTest,
     updateTestLinkStatus,
     updateIsMonitoredStatus,
+    assignQuestionsToPlacementTestService,
+    fetchTestTopicIdsAndQnNumsService,
+    savePlacementTestResultsService,
+    checkIfCandidateAttendedTestService,
+    getAllResultsByTestIdService,
+    getPlacementTestResultsByCandidateIdService
 };

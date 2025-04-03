@@ -32,9 +32,23 @@ const SignInForm = () => {
         localStorage.setItem('role', response.data.role)
         localStorage.setItem('email', response.data.emailId)
         // On success, redirect to dashboard or home
+
         setTimeout(() => {
-          navigate('/common-dashboard');
-        }, 2000);
+          const redirectUrl = sessionStorage.getItem('redirectUrl'); // Check if there's a redirect URL saved in sessionStorage
+          console.log('redirect url to test', redirectUrl);
+
+          if (redirectUrl) {
+            // Set email verification status only when redirectUrl exists
+            sessionStorage.setItem('isEmailVerified', 'true');  // Save the email verification status when again redirected to test link this will be used
+            navigate(redirectUrl);  // Redirect to the test URL
+          } else {
+            // If no redirect URL exists, navigate to a default page (common-dashboard)
+            setTimeout(() => {
+              navigate('/common-dashboard');
+            }, 2000);  
+          }
+        }, 2000); // Simulate an API request delay of 2 seconds
+
       }
     } catch (error) {
       setErrorMessage('Invalid credentials. Please try again.');

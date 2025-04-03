@@ -1,3 +1,4 @@
+const xlsx = require('xlsx');
 const CustomError = require("../../errors/CustomErrors");
 const { CumulativeQuestion, Topic, CQPlacementTest, PlacementTest, Option, CorrectAnswer } = require("../../models");
 
@@ -141,12 +142,13 @@ const assignQuestionsToPlacementTestService = async (placement_test_id, question
 const saveQuestionAndAddToLinkService = async (data) => {
     try {
         const { topic_id, question_description, no_of_marks_allocated, difficulty_level, options, correct_options, placement_test_id } = data;
-
+        console.log("test id received in service method ", placement_test_id)
         const newQuestion = await CumulativeQuestion.create({
             topic_id,
             question_description,
             no_of_marks_allocated,
             difficulty_level,
+            test_id:placement_test_id
         });
 
         const questionId = newQuestion.cumulative_question_id;
@@ -450,6 +452,32 @@ const updateQuestionService = async (cumulative_question_id, question_descriptio
     }
 };
 
+const fetchQuestionsByTopicIdService = async (topic_id) => {
+    try {
+        const questions = await CumulativeQuestion.findAll({
+            where: { topic_id },
+            // attributes: ['cumulative_question_id', 'question_description', 'topic_id', 'correct_answer'] // Uncomment and adjust attributes if necessary
+        });
+
+        if (!questions.length) {
+            throw new CustomError('No questions found for this topic', 'NO_QUESTIONS_FOUND');
+        }
+
+        return questions;
+    } catch (error) {
+        console.error('Error in fetchQuestionsByTopicIdService:', error);
+
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        if (error.code === 'NO_QUESTIONS_FOUND') {
+            throw new CustomError(error.message, error.code);
+        }
+
+        throw new CustomError('Error fetching questions: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
 
 
 
@@ -464,4 +492,5 @@ module.exports = {
     getQuestionCountsByTopicIds,
     fetchQuestionsByTestIdService,
     updateQuestionService,
+    fetchQuestionsByTopicIdService
 }

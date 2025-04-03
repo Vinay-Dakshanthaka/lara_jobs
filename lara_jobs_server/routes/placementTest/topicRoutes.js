@@ -18,5 +18,4 @@ topicRoutes.get('/topics-by-subject/:subject_id', topicController.getTopicsBySub
 topicRoutes.post('/topics-assignedto-test', topicController.getTopicsByPlacementTestId);
 
 
-
 module.exports = topicRoutes

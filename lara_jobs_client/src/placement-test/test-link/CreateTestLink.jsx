@@ -216,7 +216,7 @@ const CreateTestLink = () => {
 
 
     return (
-        <div className="max-w-4xl mx-auto mt-5 p-4 bg-white shadow-md rounded-lg">
+        <div className="max-w-4xl mx-auto mt-5 p-4 bg-white shadow-md rounded-lg text-black">
             {/* Alert */}
             {alert.show && (
                 <div className={`p-4 mb-4 text-white rounded-md ${alert.variant === "success" ? "bg-green-500" : "bg-red-500"}`}>

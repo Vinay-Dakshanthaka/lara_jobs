@@ -172,9 +172,9 @@ const EditTestLinkQuestions = () => {
                             const hasMismatch = question.correct_answers.some(correct => !optionDescriptions.includes(correct));
 
                             return (
-                                <tr key={question.placement_question_id} className={hasMismatch ? 'bg-red-600 text-white' : ''}>
+                                <tr key={index} className={hasMismatch ? 'bg-red-600 text-white' : ''}>
                                     <td className="border px-4 py-2">{index + 1}</td>
-                                    <td className="border px-4 py-2" style={{ maxWidth: '60vw' }}>
+                                    <td className="border px-4 py-2 overflow-x-auto text-wrap" style={{ maxWidth: '60vw' }}>
                                         <pre>{question.question_description}</pre>
                                         {hasMismatch && (
                                             <div className="mt-2 flex items-center">
@@ -226,7 +226,7 @@ const EditTestLinkQuestions = () => {
                         <div className="p-4">
                             <form>
                                 {/* Question Description */}
-                                <div className="mb-4">
+                                <div className="mb-4 overflow-x-auto">
                                     <label
                                         htmlFor="question_description"
                                         className="block text-sm font-medium text-gray-700"
@@ -239,7 +239,7 @@ const EditTestLinkQuestions = () => {
                                         onChange={(e) => handleChange(e)}
                                         rows={4}
                                         placeholder="Enter question description"
-                                        className="mt-1 block w-full p-2 border-2 border-gray-300 rounded-md"
+                                        className="mt-1 block w-full p-2 border-2 border-gray-300 rounded-md overflow-x-auto"
                                     />
                                 </div>
 
