@@ -24,7 +24,7 @@ const Sidebar = () => {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="flex flex-col h-screen p-3 bg-gray-800 shadow w-60">
+        <div className="flex flex-col h-screen p-3 bg-orange-500 shadow w-60">
             <div className="space-y-3">
                 <div className="flex items-center">
                     <h2 className="text-xl font-bold text-white">Dashboard</h2>
@@ -33,7 +33,7 @@ const Sidebar = () => {
                 <div className="flex-1">
                     <ul className="pt-2 pb-4 space-y-1 text-sm">
                         {/* Home Link */}
-                        <li className={`rounded-sm ${isActive("/common-dashboard") ? 'bg-gray-700' : ''}`}>
+                        {/* <li className={`rounded-sm ${isActive("/common-dashboard") ? 'bg-gray-700' : ''}`}>
                             <button
                                 onClick={() => navigate("/common-dashboard")}
                                 className={`flex items-center p-2 space-x-3 rounded-md ${isActive("/common-dashboard") ? 'text-white' : 'text-gray-100'}`}
@@ -41,7 +41,7 @@ const Sidebar = () => {
                                 <HomeIcon className="w-6 h-6" />
                                 <span>Home</span>
                             </button>
-                        </li>
+                        </li> */}
 
                         {/* Dashboard Link */}
                         <li className={`rounded-sm ${isActive("/common-dashboard") ? 'bg-gray-700' : ''}`}>
@@ -64,7 +64,7 @@ const Sidebar = () => {
                         </li>
 
                         {/* Settings Link */}
-                        <li className={`rounded-sm ${isActive("/settings") ? 'bg-gray-700' : ''}`}>
+                        {/* <li className={`rounded-sm ${isActive("/settings") ? 'bg-gray-700' : ''}`}>
                             <button
                                 onClick={() => navigate("/settings")}
                                 className={`flex items-center p-2 space-x-3 rounded-md ${isActive("/settings") ? 'text-white' : 'text-gray-100'}`}
@@ -72,7 +72,7 @@ const Sidebar = () => {
                                 <CogIcon className="w-6 h-6" />
                                 <span>Settings</span>
                             </button>
-                        </li>
+                        </li> */}
 
                         {/* Logout Link */}
                         <li className="rounded-sm">

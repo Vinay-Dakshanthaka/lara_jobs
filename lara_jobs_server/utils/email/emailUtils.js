@@ -74,4 +74,4 @@ const sendEmail = async (email, subject, message) => {
     }
 };
 
-module.exports = { sendEmailOTP, sendEmail };
+module.exports = { sendEmailOTP, sendEmail, transporter };

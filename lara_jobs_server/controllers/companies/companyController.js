@@ -1,21 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-// Set up multer for file upload
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, '../uploads/excel');
-        
-        // Check if the directory exists, and create it if not
-        fs.existsSync(uploadPath) || fs.mkdirSync(uploadPath, { recursive: true });
 
-        cb(null, uploadPath);  // Directory to store uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}_${file.originalname}`);
-    }
-});
-const upload = multer({ storage: storage }).single('file');
 
 const handleError = require('../../errors/errorHandler');
 const companyService = require('../../services/company/companyServices')
@@ -103,27 +89,71 @@ const deleteCompanyController = async (req, res) => {
     }
 };
 
-const uploadCompanyExcel = async (req, res) => {
-    upload(req, res, async (err) => {
-        if (err) {
-            return res.status(400).json({ success: false, message: 'Error uploading file', error: err.message });
-        }
-        try {
-            const filePath = path.join(__dirname, '../uploads/excel', req.file.file);
 
-            const companies = await companyService.processExcelFile(filePath);
 
-            return res.status(200).json({
-                success: true,
-                message: 'Companies data uploaded successfully',
-                data: companies,
-            });
-        } catch (error) {
-            console.error('Error while uploading companies excel:', error);
-            return res.status(500).json({ success: false, message: error.message });
-        }
-    });
+
+// Set the destination folder path
+const uploadFolder = path.join(__dirname, '../uploads/excel');
+
+// Check if the directory exists, if not, create it
+const ensureDirectoryExistence = (folderPath) => {
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });  // Creates the directory if it doesn't exist
+  }
 };
+
+// Set storage engine for Multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // Ensure the directory exists before uploading the file
+    ensureDirectoryExistence(uploadFolder);
+
+    cb(null, uploadFolder); // Set destination folder for uploads
+  },
+  filename: (req, file, cb) => {
+    // Use a unique filename based on timestamp and original file extension
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+  // File filter (to accept only Excel files)
+  const fileFilter = (req, file, cb) => {
+    const allowedFileTypes = /xlsx|xls/;
+    const mimeType = file.mimetype;
+    const extname = path.extname(file.originalname).toLowerCase();
+  
+    if (allowedFileTypes.test(extname) && mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      return cb(null, true);
+    } else {
+      return cb(new Error('Only Excel files are allowed!'), false);  // Reject non-Excel files
+    }
+  };
+  
+  // Initialize multer with storage and file filter
+  const upload = multer({ storage, fileFilter });
+  
+  // The uploadCompanyExcel function
+  const uploadCompanyExcel = async (req, res) => {
+    upload.single('file')(req, res, async (err) => {  
+      if (err) {
+        console.error('Error uploading file:', err.message);
+        return res.status(400).json({ success: false, message: 'Error uploading file', error: err.message });
+      }
+      console.log('Received file:', req.file);  // Check if file is available
+      try {
+        const filePath = path.join(__dirname, '../uploads/excel', req.file.filename);
+        const companies = await companyService.processExcelFile(filePath);
+  
+        return res.status(200).json({
+          success: true,
+          message: 'Companies data uploaded successfully',
+          data: companies,
+        });
+      } catch (error) {
+        console.error('Error while uploading companies excel:', error);
+        return res.status(500).json({ success: false, message: error.message });
+      }
+    });
+  };
 
 module.exports = {
     createCompanyController,

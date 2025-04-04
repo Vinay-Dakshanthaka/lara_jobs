@@ -35,7 +35,7 @@ const SignInForm = () => {
 
         setTimeout(() => {
           const redirectUrl = sessionStorage.getItem('redirectUrl'); // Check if there's a redirect URL saved in sessionStorage
-          console.log('redirect url to test', redirectUrl);
+          // console.log('redirect url to test', redirectUrl);
 
           if (redirectUrl) {
             // Set email verification status only when redirectUrl exists
@@ -45,7 +45,7 @@ const SignInForm = () => {
             // If no redirect URL exists, navigate to a default page (common-dashboard)
             setTimeout(() => {
               navigate('/common-dashboard');
-            }, 2000);  
+            }, 1000);
           }
         }, 2000); // Simulate an API request delay of 2 seconds
 
@@ -58,12 +58,12 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen dark:bg-dark-900 bg-dark-500">
-      <div className="w-full max-w-md p-8 bg-dark-300 dark:bg-dark-600 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-white">Sign In</h2>
+    <div className="flex justify-center items-center min-h-screen dark:bg-dark-900 ">
+      <div className="w-full max-w-md p-8 bg-dark-300 dark:bg-dark-600 rounded-lg shadow-lg bg-white">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-black">Sign In</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-700">Email</label>
             <input
               type="email"
               id="email"
@@ -77,7 +77,7 @@ const SignInForm = () => {
           </div>
 
           <div className="mb-4 relative">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-700">Password</label>
             <input
               type={passwordVisible ? 'text' : 'password'}
               id="password"
@@ -116,7 +116,19 @@ const SignInForm = () => {
             Don't have an account?{' '}
             <button
               onClick={() => navigate('/signup')}
-              className="text-sm text-blue-500 hover:underline dark:text-blue-400"
+              className="text-sm text-blue-700 hover:underline dark:text-blue-900"
+            >
+              Click Here.
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 text-center">
+          <div>
+            Forgot Password?{' '}
+            <button
+              onClick={() => navigate('/forgot-password')}
+              className="text-sm text-blue-700 hover:underline dark:text-blue-900"
             >
               Click Here.
             </button>

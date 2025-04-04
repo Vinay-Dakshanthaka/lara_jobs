@@ -1,5 +1,7 @@
 const CustomError = require("../../errors/CustomErrors");
 const { Company } = require("../../models");
+const XLSX = require('xlsx');
+
 
 // Create a new company
 const createCompany = async (companyData) => {

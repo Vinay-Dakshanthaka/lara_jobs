@@ -13,14 +13,14 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex h-screen dark:bg-gray-800">
+    <div className="flex h-screen">
       {/* Sidebar - Show AdminSidebar if user is admin, else show regular Sidebar */}
-      <div className="hidden lg:flex lg:w-60 bg-gray-900 dark:bg-gray-700">
+      <div className="hidden lg:flex lg:w-60 bg-orange-500">
         {userRole === "ADMIN" ? <AdminSidebar /> : <Sidebar userRole={userRole} />}
       </div>
 
       {/* Main content area where components will be rendered */}
-      <div className="flex-1 bg-gray-200 dark:bg-gray-700 p-4 text-gray-800 dark:text-white overflow-x-auto">
+      <div className="flex-1 bg-indigo-500  p-4 text-gray-800 dark:text-white overflow-x-auto">
         <BackButton />
         <Outlet /> {/* This is where nested routes will render */}
       </div>

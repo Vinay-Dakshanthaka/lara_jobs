@@ -48,10 +48,9 @@ const deleteCompany = async (companyId) => {
   }
 };
 
-const uploadExcelFile = async (file) => {
+const uploadExcelFile = async (formData) => {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      
   
       const response = await axios.post(`${baseURL}/api/company/upload-excel`, formData, {
         headers: {

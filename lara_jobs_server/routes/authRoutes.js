@@ -11,4 +11,8 @@ authRoutes.post('/resend-email-otp', authController.resendOtpHandler);
 
 authRoutes.post('/login', authController.login);
 
+authRoutes.post('/password-reset-email', authController.sendPasswordResetEmail);
+
+authRoutes.post('/reset-password', authController.resetPassword);
+
 module.exports = authRoutes

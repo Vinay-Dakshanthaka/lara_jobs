@@ -47,96 +47,96 @@ const PlacementTest = () => {
 
     //code to prevent open new tab and opening the context menu 
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        const handleVisibilityChange = async () => {
-            if (!showSummary && document.hidden && !isSubmitting) {
-                setIsCameraOn(false);
-                setIsMonitored(false);
-                setAutoSubmit(true);
+    //     const handleVisibilityChange = async () => {
+    //         if (!showSummary && document.hidden && !isSubmitting) {
+    //             setIsCameraOn(false);
+    //             setIsMonitored(false);
+    //             setAutoSubmit(true);
 
-                // Evaluate answers and calculate obtained marks before submitting
-                await handleSubmitTest();
+    //             // Evaluate answers and calculate obtained marks before submitting
+    //             await handleSubmitTest();
 
-                navigate('/malpractice-detected');
-            }
-        };
+    //             navigate('/malpractice-detected');
+    //         }
+    //     };
 
-        const handlePopState = async () => {
-            if (!showSummary && !isSubmitting) {
-                setAutoSubmit(true);
+    //     const handlePopState = async () => {
+    //         if (!showSummary && !isSubmitting) {
+    //             setAutoSubmit(true);
 
-                // Evaluate answers and calculate obtained marks before submitting
-                await handleSubmitTest();
+    //             // Evaluate answers and calculate obtained marks before submitting
+    //             await handleSubmitTest();
 
-                navigate('/malpractice-detected');
-            }
-        };
+    //             navigate('/malpractice-detected');
+    //         }
+    //     };
 
-        const setupListeners = () => {
-            document.addEventListener("visibilitychange", handleVisibilityChange);
-            window.addEventListener("popstate", handlePopState);
-        };
+    //     const setupListeners = () => {
+    //         document.addEventListener("visibilitychange", handleVisibilityChange);
+    //         window.addEventListener("popstate", handlePopState);
+    //     };
 
-        const cleanupListeners = () => {
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
-            window.removeEventListener("popstate", handlePopState);
-        };
+    //     const cleanupListeners = () => {
+    //         document.removeEventListener("visibilitychange", handleVisibilityChange);
+    //         window.removeEventListener("popstate", handlePopState);
+    //     };
 
-        setupListeners();
+    //     setupListeners();
 
-        return () => {
-            cleanupListeners();
-        };
-    }, [navigate, showSummary, isSubmitting]);
-
-
-    useEffect(() => {
+    //     return () => {
+    //         cleanupListeners();
+    //     };
+    // }, [navigate, showSummary, isSubmitting]);
 
 
-        const disableRightClick = (event) => {
-            event.preventDefault();
-        };
+    // useEffect(() => {
 
-        const disableDevTools = (event) => {
-            // Block F12
-            if (event.key === "F12") {
-                event.preventDefault();
-            }
-            // Block Ctrl + Shift + I
-            if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === "I") {
-                event.preventDefault();
-            }
-        };
 
-        const disableSelection = (event) => {
-            event.preventDefault();
-        };
+    //     const disableRightClick = (event) => {
+    //         event.preventDefault();
+    //     };
 
-        const disableCopy = (event) => {
-            event.preventDefault();
-        };
+    //     const disableDevTools = (event) => {
+    //         // Block F12
+    //         if (event.key === "F12") {
+    //             event.preventDefault();
+    //         }
+    //         // Block Ctrl + Shift + I
+    //         if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === "I") {
+    //             event.preventDefault();
+    //         }
+    //     };
 
-        const setupListeners = () => {
-            document.addEventListener("contextmenu", disableRightClick); // Disable right-click
-            document.addEventListener("keydown", disableDevTools); // Block dev tools
-            document.addEventListener("selectstart", disableSelection); // Disable text selection
-            document.addEventListener("copy", disableCopy); // Disable copying
-        };
+    //     const disableSelection = (event) => {
+    //         event.preventDefault();
+    //     };
 
-        const cleanupListeners = () => {
-            document.removeEventListener("contextmenu", disableRightClick);
-            document.removeEventListener("keydown", disableDevTools);
-            document.removeEventListener("selectstart", disableSelection);
-            document.removeEventListener("copy", disableCopy);
-        };
+    //     const disableCopy = (event) => {
+    //         event.preventDefault();
+    //     };
 
-        setupListeners();
+    //     const setupListeners = () => {
+    //         document.addEventListener("contextmenu", disableRightClick); // Disable right-click
+    //         document.addEventListener("keydown", disableDevTools); // Block dev tools
+    //         document.addEventListener("selectstart", disableSelection); // Disable text selection
+    //         document.addEventListener("copy", disableCopy); // Disable copying
+    //     };
 
-        return () => {
-            cleanupListeners();
-        };
-    }, [isEmailVerified]);
+    //     const cleanupListeners = () => {
+    //         document.removeEventListener("contextmenu", disableRightClick);
+    //         document.removeEventListener("keydown", disableDevTools);
+    //         document.removeEventListener("selectstart", disableSelection);
+    //         document.removeEventListener("copy", disableCopy);
+    //     };
+
+    //     setupListeners();
+
+    //     return () => {
+    //         cleanupListeners();
+    //     };
+    // }, [isEmailVerified]);
 
     // code to prevent open new tab and opening the context menu ends 
 
@@ -426,7 +426,7 @@ const PlacementTest = () => {
                                     <OnlineTestMonitoring
                                         isCameraOn={isMonitored}
                                         style={{ marginLeft: '90%', position: 'fixed', borderRadius: '100%', width: '80px', height: '80px', top: '0' }}
-                                        className='fixed'
+                                        className='fixed pointer-events-none'
                                     />
                                 )}
                             </div>
@@ -535,6 +535,12 @@ const PlacementTest = () => {
                                             >
                                                 Goto Dashboard
                                             </Link>
+                                            <Link
+                                            to="/candidate/companies/show"
+                                            className="bg-blue-500 text-white ms-3 py-2 px-4 rounded-full inline-block text-center cursor-pointer"
+                                        >
+                                            Companies near you
+                                        </Link>
                                         </div>
 
                                         <div className="text-center">
@@ -605,6 +611,12 @@ const PlacementTest = () => {
                                             className="bg-blue-500 text-white py-2 px-4 rounded-full inline-block text-center cursor-pointer"
                                         >
                                             Goto Dashboard
+                                        </Link>
+                                        <Link
+                                            to="/candidate/companies/show"
+                                            className="bg-blue-500 text-white py-2 px-4 rounded-full inline-block text-center cursor-pointer"
+                                        >
+                                            Companies near you
                                         </Link>
                                     </div>
                                 </div>

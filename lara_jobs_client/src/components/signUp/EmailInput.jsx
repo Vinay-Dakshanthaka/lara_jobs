@@ -43,7 +43,7 @@ const EmailInput = ({ handleSubmitEmail, loading, errorMessage }) => {
           </button>
           <p className="text-center my-3">
             <button type="button" onClick={handleSignInRedirect} className="text-white">
-              Have an account? <span className="underline text-blue-500">Sign In</span>
+              Have an account? <span className="underline text-blue-900">Sign In</span>
             </button>
           </p>
         </Form>

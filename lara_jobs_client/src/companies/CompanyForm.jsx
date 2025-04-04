@@ -28,7 +28,7 @@ const CompanyForm = ({ isEditMode = false }) => {
                     setCompanyData(response.data);
                 } catch (error) {
                     toast.error("Error fetching company data");
-                    navigate("/admin/company/companies-list"); // Redirect to list on error
+                    navigate("/admin/company/companies-list"); 
                 } finally {
                     setLoading(false);
                 }

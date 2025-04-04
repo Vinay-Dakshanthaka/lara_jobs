@@ -34,8 +34,8 @@ const Profile = () => {
 
     return (
         <>
-            <div className="h-96 dark:bg-gray-700 bg-gray-200 pt-1">
-                <div className="max-w-sm mx-auto bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-lg">
+            <div className="h-96 pt-1">
+                <div className="max-w-sm mx-auto  bg-white rounded-lg overflow-hidden shadow-lg text-black">
                     <div className="px-4 py-2">
                         <div className="text-center my-4">
                             <img
@@ -44,15 +44,15 @@ const Profile = () => {
                                 alt="Profile picture"
                             />
                             <div className="py-2">
-                                <h3 className="font-bold text-2xl text-gray-800 dark:text-white">
+                                <h3 className="font-bold text-2xl ">
                                     {name || 'N/A'}
                                 </h3>
-                                <h6 className="text-gray-300 dark:text-white mb-1 inline-flex items-center">
+                                <h6 className="mb-1 inline-flex items-center">
                                     {email || 'N/A'} {emailVerificationIcon}
                                 </h6>
-                                <div className="inline-flex text-gray-700 dark:text-gray-300 items-center">
+                                <div className="inline-flex   items-center">
                                     <svg
-                                        className="h-5 w-5 text-gray-400 dark:text-gray-600 mr-1"
+                                        className="h-5 w-5  mr-1"
                                         fill="currentColor"
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24"
@@ -67,7 +67,7 @@ const Profile = () => {
                                     <br />
                                     {state || 'N/A'}
                                 </div>
-                                <div className="text-gray-700 dark:text-gray-300 mt-4">
+                                <div className="mt-4">
                                     <p><strong>Phone Number: +</strong> {phone_number || 'N/A'}</p>
                                 </div>
                             </div>

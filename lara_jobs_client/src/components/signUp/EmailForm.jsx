@@ -213,8 +213,8 @@ const EmailForm = ({ onOtpVerified }) => {
 
   return (
     <>
-      <div className="flex justify-center items-center h-screen bg-dark-500 ">
-        <div className="w-full max-w-sm p-6 border rounded-lg bg-dark-900 ">
+      <div className="flex justify-center items-center h-screen">
+        <div className="w-full max-w-sm p-6 border rounded-lg  ">
           {!otpSent ? (
             <EmailInput
               handleSubmitEmail={handleSubmitEmail}

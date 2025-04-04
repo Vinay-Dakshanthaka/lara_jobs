@@ -15,17 +15,23 @@ const UploadCompaniesExcel = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!file) {
       toast.error("Please select an Excel file to upload");
       return;
     }
-
+  
+    const fileExtension = file.name.split('.').pop();
+    if (!['xlsx', 'xls'].includes(fileExtension)) {
+      toast.error("Only Excel files are allowed");
+      return;
+    }
+  
     const formData = new FormData();
     formData.append("file", file);
-
+  
     setIsLoading(true);
-
+  
     try {
       const response = await uploadExcelFile(formData);
       toast.success(response.message || "Companies uploaded successfully!");
@@ -34,7 +40,7 @@ const UploadCompaniesExcel = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">

@@ -22,7 +22,7 @@ const AdminSidebar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="flex flex-col h-screen p-3 bg-gray-800 shadow w-60">
+    <div className="flex flex-col h-screen p-3 bg-orange-500 shadow w-60">
       <div className="space-y-3">
         <div className="flex items-center">
           <h2 className="text-xl font-bold text-white">Admin Dashboard</h2>
@@ -31,7 +31,7 @@ const AdminSidebar = () => {
         <div className="flex-1 overflow-y-auto">
           <ul className="pt-2 pb-4 space-y-1 text-sm">
             {/* Home Link */}
-            <li className={`rounded-sm ${isActive("/common-dashboard") ? 'bg-gray-700' : ''}`}>
+            <li className={`rounded-sm ${isActive("/common-dashboard") ? 'bg-indigo-700' : ''}`}>
               <button
                 onClick={() => navigate("/common-dashboard")}
                 className={`flex items-center p-2 space-x-3 rounded-md w-full ${isActive("/common-dashboard") ? 'text-white' : 'text-gray-100'}`}
@@ -42,7 +42,7 @@ const AdminSidebar = () => {
             </li>
 
             {/* Manage Subjects Link */}
-            <li className={`rounded-sm ${isActive('/admin/subject/add-subject') ? 'bg-gray-700' : ''}`}>
+            <li className={`rounded-sm ${isActive('/admin/subject/add-subject') ? 'bg-indigo-700' : ''}`}>
               <button
                 onClick={() => navigate('/admin/subject/add-subject')}
                 className={`flex items-center p-2 space-x-3 rounded-md w-full ${isActive('/admin/subject/add-subject') ? 'text-white' : 'text-gray-100'}`}
@@ -53,7 +53,7 @@ const AdminSidebar = () => {
             </li>
 
             {/* Manage Questions / Test Links */}
-            <li className={`rounded-sm ${isActive('/admin/testlink/create') || isActive('/admin/testlink/all-links') ? 'bg-gray-700' : ''}`}>
+            <li className={`rounded-sm ${isActive('/admin/testlink/create') || isActive('/admin/testlink/all-links') ? 'bg-indigo-700' : ''}`}>
               <button
                 onClick={() => setIsManageQuestionsOpen(!isManageQuestionsOpen)}
                 className={`flex items-center p-2 space-x-3 rounded-md w-full ${isActive('/admin/testlink/create') || isActive('/admin/testlink/all-links') ? 'text-white' : 'text-gray-100'}`}
@@ -68,7 +68,7 @@ const AdminSidebar = () => {
                   <li>
                     <button
                       onClick={() => navigate("/admin/testlink/create")}
-                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-gray-700 ${isActive("/admin/testlink/create") ? 'bg-gray-900 text-white' : ''}`}
+                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-indigo-700 ${isActive("/admin/testlink/create") ? 'bg-indigo-600 text-white' : ''}`}
                     >
                       <PencilIcon className="w-4 me-2"/>
                       <span>Create Test link</span>
@@ -77,7 +77,7 @@ const AdminSidebar = () => {
                   <li>
                     <button
                       onClick={() => navigate("/admin/testlink/all-links")}
-                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-gray-700 ${isActive("/admin/testlink/all-links") ? 'bg-gray-900 text-white' : ''}`}
+                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-indigo-700 ${isActive("/admin/testlink/all-links") ? 'bg-indigo-600 text-white' : ''}`}
                     >
                       <ListBulletIcon className="w-4 me-2"/>
                       <span>Test Links</span>
@@ -88,7 +88,7 @@ const AdminSidebar = () => {
             </li>
 
             {/* Manage Companies  */}
-            <li className={`rounded-sm ${isActive('/admin/company/create') || isActive('/admin/company/companies-list') ? 'bg-gray-700' : ''}`}>
+            <li className={`rounded-sm ${isActive('/admin/company/create') || isActive('/admin/company/companies-list') || isActive('/admin/company/upload') ? 'bg-indigo-700' : ''}`}>
               <button
                 onClick={() => setIsManageCompaniesOpen(!isManageCompaniesOpen)}
                 className={`flex items-center p-2 space-x-3 rounded-md w-full ${isActive('/admin/company/create') || isActive('/admin/company/companies-list') ? 'text-white' : 'text-gray-100'}`}
@@ -103,7 +103,7 @@ const AdminSidebar = () => {
                   <li>
                     <button
                       onClick={() => navigate("/admin/company/create")}
-                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-gray-700 ${isActive("/admin/company/create") ? 'bg-gray-900 text-white' : ''}`}
+                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-indigo-700 ${isActive("/admin/company/create") ? 'bg-indigo-600 text-white' : ''}`}
                     >
                       <BuildingOfficeIcon className="w-4 me-2"/>
                       <span>Add Company</span>
@@ -112,7 +112,7 @@ const AdminSidebar = () => {
                   <li>
                     <button
                       onClick={() => navigate("/admin/company/upload")}
-                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-gray-700 ${isActive("/admin/company/create") ? 'bg-gray-900 text-white' : ''}`}
+                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-indigo-700 ${isActive("/admin/company/upload") ? 'bg-indigo-600 text-white' : ''}`}
                     >
                       <ArrowUpIcon className="w-4 me-2"/>
                       <span>Uplaod Companies</span>
@@ -121,7 +121,7 @@ const AdminSidebar = () => {
                   <li>
                     <button
                       onClick={() => navigate("/admin/company/companies-list")}
-                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-gray-700 ${isActive("/admin/company/companies-list") ? 'bg-gray-900 text-white' : ''}`}
+                      className={`flex items-center p-2 text-gray-100 rounded-md hover:bg-indigo-700 ${isActive("/admin/company/companies-list") ? 'bg-indigo-600 text-white' : ''}`}
                     >
                       <ListBulletIcon className="w-4 me-2"/>
                       <span>Companies List</span>

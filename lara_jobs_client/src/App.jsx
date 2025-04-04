@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import "./App.css";
+// import "./App.css";
 import Dashboard from "./components/candidate/Dashboard";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import EmailForm from "./components/signUp/EmailForm";
@@ -14,6 +14,7 @@ import CompanyForm from "./companies/CompanyForm";
 import CompanyList from "./companies/CompanyList";
 import CompanyDetails from "./companies/CompanyDetails";
 import UplaodCompaniesExcel from "./companies/UplaodCompaniesExcel";
+import ResetPassword from "./components/signIn/ResetPassword";
 
 // Lazy load components
 const SignInForm = React.lazy(() => import("./components/signIn/SignInForm"));
@@ -59,6 +60,7 @@ function App() {
             <Route path="/signin" element={<SignInForm />} />
             <Route path="/signup" element={<EmailForm />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/resetPassword" element={<ResetPassword />} />
             <Route path="/not-found" element={<NotFound />} />
             <Route path="/test/:test_id" element={<PlacementTest />} />
             <Route path="/inactive-test" element={<InActiveTest />} />
