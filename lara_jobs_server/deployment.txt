@@ -1,0 +1,68 @@
+sudo mkdir -p /var/www/totfd.in
+sudo cp -r /root/larajobs/lara_jobs_client/dist/* /var/www/totfd.in/
+
+
+server {
+    listen 80;
+    server_name totfd.in;
+    root /var/www/totfd.in;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+
+Set Correct Permissions Make sure the www-data user (the user Nginx runs as) has proper permissions to access the files in the new location.
+
+sudo chown -R www-data:www-data /var/www/larajobs
+sudo find /var/www/larajobs -type d -exec chmod 755 {} \;
+sudo find /var/www/larajobs -type f -exec chmod 644 {} \;
+
+
+
+vps password: sw@3eDrftgfrE
+
+public ip address: 69.62.75.52
+port number : 22
+SSH username : root
+
+Master password: Great@123
+
+
+sudo apt update
+sudo apt upgrade
+Node Version Manager : NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+restart the terminal
+nvm install 20
+
+MySqL:
+
+sudo apt install mysql-server
+sudo systemctl start mysql
+sudo systemctl status mysql
+sudo mysql -u root
+create user 'totfd'@'localhost' identified by 're#4rtfDerd'
+flush privileges;
+
+Process Manager:
+npm i -g pm2
+
+Git installation
+sudo apt install git
+sudo apt install gh
+
+
+sudo apt install nginx
+
+Git hub email id: github5@laragrooming.com
+Git hub username : lara345abc
+
+and Add a new A record:
+
+Name: @
+
+Points to: your VPS IP address
+
+TTL: default

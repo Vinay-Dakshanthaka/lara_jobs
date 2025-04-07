@@ -16,7 +16,7 @@ const CQPlacementTest = sequelize.define('CQPlacementTest', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'PlacementTest',
+            model: 'Placementtests',
             key: 'placement_test_id'
         },
         onDelete: 'CASCADE',

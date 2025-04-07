@@ -36,7 +36,7 @@ const CumulativeQuestion = sequelize.define('CumulativeQuestion', {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-            model: 'PlacementTests',
+            model: 'Placementtests',
             key: 'placement_test_id'
         },
         onDelete: 'CASCADE',
