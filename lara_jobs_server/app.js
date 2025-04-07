@@ -15,11 +15,15 @@ const companiesRoutes = require('./routes/companies/companiesRoutes')
 
 const PORT = process.env.PORT || 3000;
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({
-    // origin: `http://localhost:5173`,
-    origin : [`https://totfd.in`],
-}));
+const corsOptions = {
+    // origin: 'http://localhost:5173',    
+    origin: ['https://totfd.in'],
+  };
+  
+// Enable CORS 
+app.use(cors(corsOptions)); 
 
 app.use('/api', candidateRoutes);
 app.use('/api/auth', authRoutes);
