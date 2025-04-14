@@ -366,9 +366,8 @@ const fetchTestTopicIdsAndQnNumsService = async (encrypted_test_id) => {
     }
 };
 
-const savePlacementTestResultsService = async (placement_test_id, candidate_id, marks_obtained, total_marks) => {
+const savePlacementTestResultsService = async (placement_test_id, candidate_id, new_marks_obtained, total_marks) => {
     try {
-        // Check if there is already a result for this combination
         const existingResult = await PlacementTestResult.findOne({
             where: {
                 placement_test_id,
@@ -377,35 +376,41 @@ const savePlacementTestResultsService = async (placement_test_id, candidate_id, 
         });
 
         if (existingResult) {
-            throw new CustomError("You have already attended this test.", "DUPLICATE_RESULT");
+            // Compare marks
+            if (new_marks_obtained > existingResult.marks_obtained) {
+                // Update only if new marks are higher
+                existingResult.marks_obtained = new_marks_obtained;
+                existingResult.total_marks = total_marks;
+                await existingResult.save();
+
+                return {
+                    message: 'Marks updated to higher value.',
+                    result: existingResult,
+                };
+            } else {
+                return {
+                    message: 'Existing marks are higher. No update performed.',
+                    result: existingResult,
+                };
+            }
         }
 
-        // Check if the student exists
-        const placementStudent = await Candidate.findByPk(candidate_id);
-        if (!placementStudent) {
-            throw new CustomError("Candidat Not Found", "NOT_FOUND");
-        }
-
-        // Save the test results
-        const testResults = await PlacementTestResult.create({
+        // If no existing record, create a new one
+        const newResult = await PlacementTestResult.create({
             placement_test_id,
             candidate_id,
-            marks_obtained,
-            total_marks
+            marks_obtained: new_marks_obtained,
+            total_marks,
         });
 
-        return testResults;
+        return {
+            message: 'New result saved.',
+            result: newResult,
+        };
+
     } catch (error) {
         console.error("Error saving placement test results:", error.stack);
-        if (error.name === 'SequelizeDatabaseError') {
-            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
-        }
-
-        if (error.code === 'NOT_FOUND', error.code === 'DUPLICATE_RESULT') {
-            throw new CustomError(error.message, error.code);
-        }
-
-        throw new CustomError('Error fetching candidate: ' + error.message, 'INTERNAL_SERVER_ERROR');
+        throw new CustomError('Error saving test results: ' + error.message, 'DATABASE_ERROR');
     }
 };
 
@@ -436,6 +441,56 @@ const checkIfCandidateAttendedTestService = async (placement_test_id, candidate_
         throw new CustomError('Error checking candidate attendance: ' + error.message, 'INTERNAL_SERVER_ERROR');
     }
 };
+
+const checkCandidateEligibilityToRetakeTestService = async (placement_test_id, candidate_id) => {
+    try {
+        const existingResult = await PlacementTestResult.findOne({
+            where: {
+                placement_test_id,
+                candidate_id,
+            },
+        });
+
+        // If candidate never attended the test, they're eligible
+        if (!existingResult) {
+            return {
+                isEligible: true,
+                daysLeft: 0
+            };
+        }
+
+        const lastUpdated = new Date(existingResult.updatedAt);
+        const now = new Date();
+
+        const millisecondsInThreeWeeks = 1000 * 60 * 60 * 24 * 7 * 3;
+        const timeElapsed = now - lastUpdated;
+
+        if (timeElapsed >= millisecondsInThreeWeeks) {
+            return {
+                isEligible: true,
+                daysLeft: 0
+            };
+        }
+
+        const timeRemaining = millisecondsInThreeWeeks - timeElapsed;
+        const daysLeft = Math.ceil(timeRemaining / (1000 * 60 * 60 * 24)); // Round up to whole days
+
+        return {
+            isEligible: false,
+            daysLeft
+        };
+
+    } catch (error) {
+        console.error("Error checking candidate eligibility:", error.stack);
+
+        if (error.name === 'SequelizeDatabaseError') {
+            throw new CustomError('Database error occurred', 'DATABASE_ERROR');
+        }
+
+        throw new CustomError('Error checking candidate eligibility: ' + error.message, 'INTERNAL_SERVER_ERROR');
+    }
+};
+
 
 const getAllResultsByTestIdService = async (placement_test_id) => {
     try {
@@ -556,6 +611,7 @@ module.exports = {
     fetchTestTopicIdsAndQnNumsService,
     savePlacementTestResultsService,
     checkIfCandidateAttendedTestService,
+    checkCandidateEligibilityToRetakeTestService,
     getAllResultsByTestIdService,
     getPlacementTestResultsByCandidateIdService
 };

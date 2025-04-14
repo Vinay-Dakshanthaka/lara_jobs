@@ -79,3 +79,26 @@ export const hasCandidateAttended = async (test_id) => {
         throw error;
     }
 };
+
+export const isEligibleToRetakeTest = async (test_id) => {
+    try {
+        const token = localStorage.getItem('token');
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const response = await axios.post(`${baseURL}/api/placement-test/test/test-results/isEligibleToRetakeTest`, {
+            placement_test_id: test_id
+        }, config);
+
+        // response format: { isEligible: true, daysLeft: 0 }
+        return response.data;
+
+    } catch (error) {
+        console.error('Error checking retake eligibility:', error);
+        throw error;
+    }
+};

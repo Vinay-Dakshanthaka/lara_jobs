@@ -127,7 +127,7 @@ const PhoneForm = ({ onPhoneVerified, email }) => {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="w-full max-w-sm p-6 border rounded-lg">
-        <p className="text-slate-950">Pleas provide a valid phone Number this will be used for future communication</p>
+        <p className="text-yellow-400">Pleas provide a valid phone Number this will be used for future communication</p>
         {/* Phone Number Form */}
         {!phoneSaved ? (
           <Formik

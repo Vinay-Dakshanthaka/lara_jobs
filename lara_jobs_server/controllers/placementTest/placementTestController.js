@@ -212,7 +212,7 @@ const fetchTestTopicIdsAndQnNumsController = async (req, res) => {
 
         // Respond with the fetched details
         return res.status(200).send({
-            message: 'Placement test details retrieved successfully',
+            message: 'Placement test details retrieved successfully',   
             ...result
         });
     } catch (error) {
@@ -226,9 +226,9 @@ const savePlacementTestResultsController = async (req, res) => {
         const candidate = req.candidate;
         const candidate_id = candidate.id;
         const { placement_test_id, marks_obtained, total_marks } = req.body;
-        console.log('Candidate id received in controller ', candidate_id)
 
-        // Call the service method to save test results
+        console.log('Candidate id received in controller ', candidate_id);
+
         const testResults = await placementTestService.savePlacementTestResultsService(
             placement_test_id,
             candidate_id,
@@ -238,7 +238,6 @@ const savePlacementTestResultsController = async (req, res) => {
 
         return res.status(200).send(testResults);
     } catch (error) {
-        // Handle errors
         console.log('Error in saving placement test results:', error);
         handleError(res, error); 
     }
@@ -261,6 +260,26 @@ const checkIfCandidateAttendedTestController = async (req, res) => {
         handleError(res, error); 
     }
 };
+
+const checkCandidateEligibilityToRetakeTestController = async (req, res) => {
+    try {
+        const candidate = req.candidate;
+        const candidate_id = candidate.id;
+        const { placement_test_id } = req.body;
+
+        const { isEligible, daysLeft } = await placementTestService.checkCandidateEligibilityToRetakeTestService(placement_test_id, candidate_id);
+
+        return res.status(200).json({
+            isEligible,
+            daysLeft
+        });
+
+    } catch (error) {
+        console.error("Error checking candidate eligibility:", error);
+        handleError(res, error);
+    }
+};
+
 
 const getAllResultsByTestIdController = async (req, res) => {
     try {
@@ -303,6 +322,7 @@ module.exports = {
     fetchTestTopicIdsAndQnNumsController,
     savePlacementTestResultsController,
     checkIfCandidateAttendedTestController,
+    checkCandidateEligibilityToRetakeTestController,
     getAllResultsByTestIdController,
     getPlacementTestResultsByCandidateIdController,
 };

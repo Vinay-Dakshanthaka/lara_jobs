@@ -30,6 +30,8 @@ placementTestRoutes.post('/test-results/save', verifyJwt, placementTestControlle
 
 placementTestRoutes.post('/test-results/isCandidateAttended', verifyJwt, placementTestController.checkIfCandidateAttendedTestController);
 
+placementTestRoutes.post('/test-results/isEligibleToRetakeTest', verifyJwt, placementTestController.checkCandidateEligibilityToRetakeTestController);
+
 placementTestRoutes.post('/test-results/getAllResultsByTestId',  placementTestController.getAllResultsByTestIdController);
 
 placementTestRoutes.get('/test-results/getResultsByCandidateId', verifyJwt,  placementTestController.getPlacementTestResultsByCandidateIdController);

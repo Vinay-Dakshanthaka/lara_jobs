@@ -262,7 +262,7 @@ const CandidateTestResults = ({ email }) => {
                                     <td className="px-4 py-2 border-b">
                                         <button
                                             onClick={() => generateCertificate(studentData, testResults, index, result)}
-                                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+                                            className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600 focus:outline-none"
                                         >
                                             {sendingEmail[index] ? (
                                                 <>

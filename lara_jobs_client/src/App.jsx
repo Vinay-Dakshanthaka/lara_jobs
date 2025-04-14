@@ -15,6 +15,8 @@ import CompanyList from "./companies/CompanyList";
 import CompanyDetails from "./companies/CompanyDetails";
 import UplaodCompaniesExcel from "./companies/UplaodCompaniesExcel";
 import ResetPassword from "./components/signIn/ResetPassword";
+import PrivateRoute from "./routes/PrivateRoute";
+import RetakeTestMessage from "./placement-test/test-platform/RetakeTestMessage";
 
 // Lazy load components
 const SignInForm = React.lazy(() => import("./components/signIn/SignInForm"));
@@ -57,7 +59,12 @@ function App() {
         <Suspense fallback={<Loading />}>
           <Routes>
             {/* Public Routes */}
-            <Route path="/signin" element={<SignInForm />} />
+            <Route path="/signin" element={
+              <PrivateRoute>
+                <SignInForm />
+              </PrivateRoute>
+            } />
+            {/* <Route path="/signin" element={<SignInForm />} /> */}
             <Route path="/signup" element={<EmailForm />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/resetPassword" element={<ResetPassword />} />
@@ -65,6 +72,7 @@ function App() {
             <Route path="/test/:test_id" element={<PlacementTest />} />
             <Route path="/inactive-test" element={<InActiveTest />} />
             <Route path="/malpractice-detected" element={<MalpracticeDetected />} />
+            <Route path="/retake-message" element={<RetakeTestMessage />} />
             
 
             {/* Protected Dashboard Routes (for all authenticated users) */}

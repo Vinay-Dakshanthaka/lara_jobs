@@ -7,8 +7,9 @@ import { baseURL } from '../../config/baseURL';
 import OnlineTestMonitoring from './OnlineTestMonitoring';
 import InActiveTest from './InActiveTest';
 import toast from 'react-hot-toast';
-import { hasCandidateAttended } from '../../api/placementTest';
+import { hasCandidateAttended, isEligibleToRetakeTest } from '../../api/placementTest';
 import EmailForm from '../../components/signUp/EmailForm';
+import Loading from '../../components/loading/Loading';
 
 
 const PlacementTest = () => {
@@ -34,6 +35,8 @@ const PlacementTest = () => {
     const [testAttendedStatus, setTestAttendedStatus] = useState(false);
     const [isEmailVerified, setIsEmailVerified] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isRetakeTest, setIsRetakeTest] = useState(false);
+    const [daysLeft, setDaysLeft] = useState();
 
 
 
@@ -44,6 +47,12 @@ const PlacementTest = () => {
         }
         sessionStorage.setItem('redirectUrl', window.location.pathname);
     }, []);
+
+    useEffect(()=>{
+        if(isEmailVerified){
+            checkEligibility(test_id);
+        }
+    }, [isEmailVerified])
 
     //code to prevent open new tab and opening the context menu 
 
@@ -140,7 +149,7 @@ const PlacementTest = () => {
 
     // code to prevent open new tab and opening the context menu ends 
 
-   
+
 
 
     const showAlert = () => {
@@ -218,28 +227,56 @@ const PlacementTest = () => {
         }
     };
 
+    const checkEligibility = async () => {
+        try {
+            const result = await isEligibleToRetakeTest(test_id);
+            console.log('Retake Eligibility:', result);
+            setIsRetakeTest(result.isEligible);
+            setDaysLeft(result.daysLeft);
+
+            if (!isRetakeTest) {
+                navigate('/retake-message', {
+                    state: {
+                        isEligible: result.isEligible,
+                        daysLeft: result.daysLeft,
+                    }
+                });
+            }
+
+            // result.isEligible -> boolean
+            // result.daysLeft -> number
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+
+    // useEffect(() => {
+    //     // Check if the user has already attended the test
+    //     const checkAttendance = async () => {
+    //         await hasAttended(test_id);
+
+    //         if (testAttendedStatus) {
+    //             toast.error('You have already attended this test. You can download the certificate in your dashboard.');
+    //             navigate('/common-dashboard');
+    //         } else {
+    //             fetchTestDetails();
+    //         }
+    //     };
+
+    //     checkAttendance();
+
+    //     // Cleanup timer if the component unmounts
+    //     return () => {
+    //         if (timerRef.current) {
+    //             clearInterval(timerRef.current);
+    //         }
+    //     };
+    // }, [test_id, testAttendedStatus]);
+
     useEffect(() => {
-        // Check if the user has already attended the test
-        const checkAttendance = async () => {
-            await hasAttended(test_id);
-
-            if (testAttendedStatus) {
-                toast.error('You have already attended this test. You can download the certificate in your dashboard.');
-                navigate('/common-dashboard');
-            } else {
-                fetchTestDetails();
-            }
-        };
-
-        checkAttendance();
-
-        // Cleanup timer if the component unmounts
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-        };
-    }, [test_id, testAttendedStatus]);
+        fetchTestDetails();
+    }, [])
 
 
     // Utility function to shuffle the array
@@ -358,8 +395,8 @@ const PlacementTest = () => {
                 ...response.data,
                 question_ans_data: questionAnsData,
             });
-            setIsMonitored(false);
             setIsCameraOn(false);
+            setIsMonitored(false);
             setShowSummary(true);
 
             // If the certificate is to be generated
@@ -410,9 +447,28 @@ const PlacementTest = () => {
         }).length;
     };
 
+    const handleGoToDashboard = () => {
+        // Stop camera monitoring
+        setIsMonitored(false); // this unmounts the component
+        isCameraOn(false)
+        setTimeout(() => {
+            navigate('/common-dashboard');
+        }, 300); // give the component time to unmount and cleanup
+    };
+
+    const handleGoToCompaniesList = () => {
+        // Stop camera monitoring
+        setIsMonitored(false); // this unmounts the component
+        isCameraOn(false)
+        setTimeout(() => {
+            navigate('/candidate/companies/show');
+        }, 300); // give the component time to unmount and cleanup
+    };
+
     if (loading) {
-        return <div>Loading...</div>;
+        return <div><Loading /></div>;
     }
+
 
     return (
         <>
@@ -529,18 +585,18 @@ const PlacementTest = () => {
                                         </a>
                                     </div> */}
                                         <div className="text-center">
-                                            <Link
-                                                to="/common-dashboard"
+                                            <button
+                                                onClick={handleGoToDashboard}
                                                 className="bg-blue-500 text-white py-2 px-4 rounded-full inline-block text-center cursor-pointer"
                                             >
                                                 Goto Dashboard
-                                            </Link>
-                                            <Link
-                                            to="/candidate/companies/show"
-                                            className="bg-blue-500 text-white ms-3 py-2 px-4 rounded-full inline-block text-center cursor-pointer"
-                                        >
-                                            Companies near you
-                                        </Link>
+                                            </button>
+                                            <button
+                                                onClick={handleGoToCompaniesList}
+                                                className="bg-blue-500 text-white ms-3 py-2 px-4 rounded-full inline-block text-center cursor-pointer"
+                                            >
+                                                Companies near you
+                                            </button>
                                         </div>
 
                                         <div className="text-center">
@@ -606,18 +662,18 @@ const PlacementTest = () => {
                                         </table>
                                     </div>
                                     <div className="text-center my-3 mb-4">
-                                        <Link
-                                            to="/common-dashboard"
+                                        <button
+                                            onClick={handleGoToDashboard}
                                             className="bg-blue-500 text-white py-2 px-4 rounded-full inline-block text-center cursor-pointer"
                                         >
                                             Goto Dashboard
-                                        </Link>
-                                        <Link
-                                            to="/candidate/companies/show"
-                                            className="bg-blue-500 text-white py-2 px-4 rounded-full inline-block text-center cursor-pointer"
+                                        </button>
+                                        <button
+                                            onClick={handleGoToCompaniesList}
+                                            className="bg-blue-500 text-white ms-3 py-2 px-4 rounded-full inline-block text-center cursor-pointer"
                                         >
                                             Companies near you
-                                        </Link>
+                                        </button>
                                     </div>
                                 </div>
                             )}

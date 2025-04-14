@@ -219,7 +219,7 @@ const UpdateCandidateForm = () => {
 
     return (
         <div className="flex justify-center items-center h-screen">
-            <div className="w-full max-w-md p-6 border rounded-lg shadow-md bg-white">
+            <div className="w-full p-3 border rounded-lg shadow-md ">
                 <h2 className="text-2xl font-semibold text-center mb-6">Please Fill this</h2>
 
                 {errorMessage && (

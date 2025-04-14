@@ -245,7 +245,7 @@ const AllPlacementTests = () => {
                                                 className="text-blue-500 ml-2"
                                                 onClick={() => copyTestLinkToClipboard(test.test_link)}
                                             >
-                                                <ClipboardIcon className='w-4 text-black' />
+                                                <ClipboardIcon className='w-4 text-black' title='copy test link'/>
                                             </button>
                                         )}
                                     </div>

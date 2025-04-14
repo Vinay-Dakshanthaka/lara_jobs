@@ -40,36 +40,49 @@ const OnlineTestMonitoring = ({ style, className, isCameraOn }) => {
   }, []);
 
   useEffect(() => {
+    let stream;
+  
     const startVideo = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: { width: 320, height: 240 },
           audio: false,
         });
+  
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.muted = true;
-
+  
           videoRef.current.onloadedmetadata = () => {
             videoRef.current.play().catch((err) => console.error('Error playing video:', err));
           };
+  
           setVideo(videoRef.current);
         }
       } catch (error) {
         console.error('Error accessing camera:', error);
       }
     };
-
+  
     if (isCameraOn) {
       startVideo();
+    } else {
+      // Stop camera immediately if it's turned off
+      if (videoRef.current && videoRef.current.srcObject) {
+        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+      }
     }
-
+  
+    // Also clean up on component unmount
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
         videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
       }
     };
   }, [isCameraOn]);
+  
 
   useEffect(() => {
     let intervalId;

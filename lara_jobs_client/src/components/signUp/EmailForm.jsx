@@ -121,7 +121,7 @@
 // export default EmailForm;
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EmailInput from "./EmailInput";
 import OtpInput from "./OtpInput";
 import ResendOtp from "./ResendOtp";
@@ -145,6 +145,12 @@ const EmailForm = ({ onOtpVerified }) => {
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(()=>{
+    localStorage.removeItem('token')
+    localStorage.removeItem('candidate_id')
+    localStorage.removeItem('role')
+  },[])
+
   const handleSubmitEmail = async (email) => {
     try {
       setErrorMessage("");
@@ -160,8 +166,16 @@ const EmailForm = ({ onOtpVerified }) => {
       if (error.response && error.response.data.code === 'EMAIL_ALREADY_EXISTS') {
         localStorage.setItem('email', email);
         toast.error('Account exists with this email. Please Login');
-        navigate('/signin');
+        localStorage.removeItem('token')
+        localStorage.removeItem('candidate_id')
+        localStorage.removeItem('role')
+        // localStorage.removeItem('email', response.data.emailId)
+        setTimeout(()=>{
+          navigate('/signin');
+        },1000)
+
       } else {
+        console.error("error while redirecting to page..", error)
         toast.error('Error sending OTP. Please try again.');
         setErrorMessage("Error sending OTP. Please try again.");
       }
@@ -214,7 +228,7 @@ const EmailForm = ({ onOtpVerified }) => {
   return (
     <>
       <div className="flex justify-center items-center h-screen">
-        <div className="w-full max-w-sm p-6 border rounded-lg  ">
+        <div className="w-full max-w-sm p-3 border rounded-lg  ">
           {!otpSent ? (
             <EmailInput
               handleSubmitEmail={handleSubmitEmail}
@@ -247,7 +261,6 @@ const EmailForm = ({ onOtpVerified }) => {
           ) : null}
         </div>
       </div>
-
     </>
   );
 };
